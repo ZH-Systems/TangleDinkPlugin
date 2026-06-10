@@ -23,9 +23,6 @@ dependencies {
 	testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 	testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-	compileOnly group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
-	testCompileOnly group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
-
 	compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 	runtimeOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
