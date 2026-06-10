@@ -92,9 +92,14 @@ public class SettingsManager {
     /**
      * Set of our config keys that correspond to webhook URL lists.
      * <p>
-     * These are used for special logic to merge the previous value with the new value during config imports.
+     * These are used for export filtering and summary checks.
      */
     private Collection<String> webhookConfigKeys;
+
+    /**
+     * Set of config keys that must be imported with exact overwrite semantics.
+     */
+    private Collection<String> exactOverwriteConfigKeys;
 
     /**
      * User-specified RSNs that should or should not (depending on filter mode) trigger webhook notifications.
@@ -180,6 +185,10 @@ public class SettingsManager {
             .addAll(keysBySection.getOrDefault(DinkPluginConfig.webhookSection.toLowerCase().replace(" ", ""), Collections.emptySet()))
             .add("metadataWebhook") // MetaNotifier's configuration is in the Advanced section
             .build();
+        exactOverwriteConfigKeys = configValueTypes.keySet()
+            .stream()
+            .filter(key -> key.endsWith("Webhook") || "clanEventEnabled".equals(key) || "clanEventEndTime".equals(key) || "clanEventSecretCode".equals(key))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public boolean justLoggedIn() {
@@ -608,7 +617,13 @@ public class SettingsManager {
             Object prevValue = configManager.getConfiguration(CONFIG_GROUP, key, valueType);
             Object newValue;
 
-            if (shouldMerge(policies, key)) {
+            if (exactOverwriteConfigKeys.contains(key)) {
+                if (Objects.equals(value, prevValue)) {
+                    newValue = null;
+                } else {
+                    newValue = value;
+                }
+            } else if (shouldMerge(policies, key)) {
                 // special case: multi-line configs that should be merged (rather than replaced)
                 assert prevValue == null || prevValue instanceof String;
                 Collection<String> lines = readDelimited((String) prevValue).collect(Collectors.toCollection(LinkedHashSet::new));

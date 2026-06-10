@@ -105,12 +105,18 @@ public class RemoteEventManager {
         }
 
         String[] args = event.getArguments();
-        if (args == null || args.length < 3 || !"event".equalsIgnoreCase(args[0]) || !"enable".equalsIgnoreCase(args[1])) {
-            plugin.addChatWarning("Usage: " + COMMAND_PREFIX + "<eventId>");
+        if (args == null || args.length < 3 || !"event".equalsIgnoreCase(args[0])) {
+            plugin.addChatWarning(COMMAND_USAGE);
             return;
         }
 
-        enableEvent(args[2]);
+        if ("enable".equalsIgnoreCase(args[1])) {
+            enableEvent(args[2]);
+        } else if ("disable".equalsIgnoreCase(args[1])) {
+            disableEvent(args[2]);
+        } else {
+            plugin.addChatWarning(COMMAND_USAGE);
+        }
     }
 
     private void reschedulePolling() {
@@ -159,9 +165,17 @@ public class RemoteEventManager {
     }
 
     private void enableEvent(String requestedEventId) {
+        applyRemoteEvent(requestedEventId, false);
+    }
+
+    private void disableEvent(String requestedEventId) {
+        applyRemoteEvent(requestedEventId, true);
+    }
+
+    private void applyRemoteEvent(String requestedEventId, boolean disable) {
         String normalizedEventId = normalizeEventId(requestedEventId);
         if (normalizedEventId == null) {
-            plugin.addChatWarning("Please specify an event ID to enable.");
+            plugin.addChatWarning(disable ? "Please specify an event ID to disable." : "Please specify an event ID to enable.");
             return;
         }
 
@@ -175,16 +189,16 @@ public class RemoteEventManager {
                 RemoteEventConfig.Event event = validateActiveEvent(remoteConfig, normalizedEventId);
                 String eventName = StringUtils.defaultIfBlank(StringUtils.trimToNull(event.getName()), normalizedEventId);
                 return fetchMigration(event, true)
-                    .thenAccept(migration -> applyMigration(normalizedEventId, eventName, migration));
+                    .thenAccept(migration -> applyMigration(normalizedEventId, eventName, migration, disable));
             })
             .exceptionally(t -> {
                 String message = unwrap(t).getMessage();
-                plugin.addChatWarning(StringUtils.defaultIfBlank(message, "Failed to enable remote clan event."));
+                plugin.addChatWarning(StringUtils.defaultIfBlank(message, disable ? "Failed to disable remote clan event." : "Failed to enable remote clan event."));
                 return null;
             });
     }
 
-    private CompletableFuture<RemoteEventConfig> fetchRemoteConfig(boolean interactive) {
+    CompletableFuture<RemoteEventConfig> fetchRemoteConfig(boolean interactive) {
         String url = StringUtils.trimToEmpty(config.remoteEventConfigUrl());
         if (url.isEmpty()) {
             return failedFuture("Remote event config URL is blank.");
@@ -255,7 +269,7 @@ public class RemoteEventManager {
         return event;
     }
 
-    private CompletableFuture<RemoteEventMigration> fetchMigration(RemoteEventConfig.Event event, boolean interactive) {
+    CompletableFuture<RemoteEventMigration> fetchMigration(RemoteEventConfig.Event event, boolean interactive) {
         String migrationUrl = StringUtils.trimToNull(event.getMigrationUrl());
         HttpUrl url = migrationUrl != null ? HttpUrl.parse(migrationUrl) : null;
         if (url == null || !"https".equalsIgnoreCase(url.scheme())) {
@@ -304,7 +318,7 @@ public class RemoteEventManager {
         return migration;
     }
 
-    private void applyMigration(String eventId, String eventName, RemoteEventMigration migration) {
+    private void applyMigration(String eventId, String eventName, RemoteEventMigration migration, boolean disable) {
         Map<String, Object> migrationConfig = new LinkedHashMap<>(migration.getConfig());
         assert migrationConfig != null;
 
@@ -313,10 +327,14 @@ public class RemoteEventManager {
         // Clear any previous event deadline so a fresh migration without clanEventEndTime does not inherit it.
         settingsManager.clearConfigValue("clanEventEndTime");
 
+        if (disable) {
+            forceDisabledClanEventConfig(migrationConfig);
+        }
+
         log.debug("Applying remote event migration for {} with config payload: {}", eventId, gson.toJson(migrationConfig));
         settingsManager.applyImportedConfig(migrationConfig, true);
 
-        config.setClanEventEnabled(true);
+        config.setClanEventEnabled(!disable);
         config.setRemoteEventLastPromptedEventId(eventId);
 
         LinkedHashSet<String> applied = appliedEvents();
@@ -324,7 +342,16 @@ public class RemoteEventManager {
         config.setRemoteEventAppliedEventIds(String.join("\n", applied));
 
         log.debug("Applied remote clan event {}", eventId);
-        plugin.addChatSuccess("Enabled remote clan event: " + eventName);
+        plugin.addChatSuccess((disable ? "Disabled" : "Enabled") + " remote clan event: " + eventName);
+    }
+
+    private void forceDisabledClanEventConfig(Map<String, Object> migrationConfig) {
+        migrationConfig.put("clanEventEnabled", false);
+        migrationConfig.put("clanEventWebhook", "No Event happening right now");
+        migrationConfig.put("clanEventEndTime", "");
+        migrationConfig.put("clanEventSecretCode", "");
+        migrationConfig.put("killCountEnabled", false);
+        migrationConfig.put("minLootValue", 5000000);
     }
 
     private String buildPromptMessage(RemoteEventConfig.Event event) {
@@ -347,7 +374,7 @@ public class RemoteEventManager {
     }
 
     private String buildExpectedCommand(String eventId) {
-        return COMMAND_PREFIX + eventId;
+        return COMMAND_PREFIX_ENABLE + eventId;
     }
 
     private Set<String> allowedHosts() {
@@ -421,6 +448,8 @@ public class RemoteEventManager {
         return CompletableFuture.failedFuture(new IllegalArgumentException(message));
     }
 
-    private static final String COMMAND_PREFIX = "::" + COMMAND + " event enable ";
+    private static final String COMMAND_PREFIX_ENABLE = "::" + COMMAND + " event enable ";
+    private static final String COMMAND_PREFIX_DISABLE = "::" + COMMAND + " event disable ";
+    private static final String COMMAND_USAGE = "Usage: " + COMMAND_PREFIX_ENABLE + "<eventId> | " + COMMAND_PREFIX_DISABLE + "<eventId>";
 }
 
