@@ -168,7 +168,7 @@ abstract class MockedNotifierTest extends MockedTestBase {
         when(config.screenshotScale()).thenReturn(95);
         when(config.discordRichEmbeds()).thenReturn(!"false".equalsIgnoreCase(System.getenv("TEST_WEBHOOK_RICH")));
         when(config.embedFooterText()).thenReturn("Powered by Dink");
-        when(config.embedFooterIcon()).thenReturn("https://github.com/pajlads/DinkPlugin/raw/master/icon.png");
+        when(config.embedFooterIcon()).thenReturn("https://raw.githubusercontent.com/pajlads/DinkPlugin/master/tc_logo.png");
         when(config.playerLookupService()).thenReturn(PlayerLookupService.OSRS_HISCORE);
         when(config.threadNameTemplate()).thenReturn("[%TYPE%] %MESSAGE%");
         when(config.nameFilterMode()).thenReturn(FilterMode.DENY);

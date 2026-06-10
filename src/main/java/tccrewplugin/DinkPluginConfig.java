@@ -317,7 +317,7 @@ public interface DinkPluginConfig extends Config {
         section = advancedSection
     )
     default String embedFooterIcon() {
-        return "https://github.com/pajlads/DinkPlugin/raw/master/icon.png";
+        return "https://raw.githubusercontent.com/pajlads/DinkPlugin/master/tc_logo.png";
     }
 
     @ConfigItem(
