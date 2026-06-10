@@ -3,7 +3,7 @@
 Tangle Crew Plugin sends webhook messages for noteworthy Old School RuneScape events.
 It supports Discord webhooks, custom webhook handlers, rich embeds, screenshots, metadata, and a clan-event workflow that can temporarily override your normal webhook routing.
 
-The plugin includes a plugin-bar icon and uses `tc_logo.png` as its canonical art asset.
+This plugin is primarily built to work with a sister site built to make Clan Events easier
 
 Examples of the metadata payloads sent by the plugin are available in [docs/json-examples.md](docs/json-examples.md).
 
