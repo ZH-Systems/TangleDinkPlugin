@@ -1,0 +1,49 @@
+# Building and Tests
+
+This RuneLite plugin uses the [Gradle](https://docs.gradle.org/current/userguide/userguide.html) build system.
+
+See our [build script](../build.gradle) and [current gradle version](../gradle/wrapper/gradle-wrapper.properties).
+
+## Build task
+
+To compile (and test) the plugin, simply run `gradlew build`
+
+At a minimum, JDK 11+ is required for compilation, but you should avoid running the game beyond Java 21 (for example, Java 22 is known to cause swing-related crashes).
+
+If you haven't installed a [JDK](https://whichjdk.com/), we typically recommend using [Eclipse Temurin](https://adoptium.net/temurin/releases/).
+
+## RuneLite run task
+
+To launch RuneLite with Dink loaded, run `gradlew run`
+
+This uses `tccrewplugin.DinkTest` with:
+
+- VM arguments: `-ea`
+- Program arguments: `--developer-mode --debug`
+
+For IntelliJ, you can import the checked-in [Run Dink](../.run/Run%20Dink.run.xml) run configuration.
+
+## Shadow Jar task
+
+To create an executable JAR (with dependencies), run `gradlew shadowJar`
+
+Note: to be able to run this jar, the "enable assertions" flag (`-ea`) must be specified.
+See our [IDE run config](../.run/Run%20Dink.run.xml) for other common parameters.
+
+## Test task
+
+Dink features a comprehensive test suite using [JUnit5](https://junit.org/junit5/) and [Mockito](https://site.mockito.org/) to test individual notifiers (and their OkHttp integration).
+
+To execute these tests, run `gradlew test`
+
+### Configuration
+
+In order for the test notifications to be sent to an actual webhook server,
+one can specify the environmental variable: `TEST_WEBHOOK_URL`.
+
+In addition, one can disable the Discord rich embed formatting of test notifications
+by setting the environmental variable `TEST_WEBHOOK_RICH` to `false`.
+
+Currently, it is not possible to enable the webhook retry behavior (or configure timeouts)
+for tests without modifying [MockedNotifierTest](../src/test/java/TcCrewPlugin/notifiers/MockedNotifierTest.java).
+
