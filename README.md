@@ -1,5 +1,21 @@
 # Tangle Crew Plugin
 
+## What Changed From The Original
+
+This repository is not the original Dink plugin. It is a fork tailored for the Tangle Crew workflow.
+
+The main project-level changes in this fork are:
+
+- Rebranding and packaging changes from the original Dink identity to `Tangle Crew Plugin`
+- A clan-event-first workflow instead of a generic webhook-only workflow
+- Support for a sister site that can coordinate clan events outside the game client
+- Remote clan-event enable/disable commands through `::DinkEvent`
+- Remote event config polling and migration settings for pulling active event data into the plugin
+- Clan-event webhook routing that can temporarily override normal notifier webhook destinations
+- Overlay support for showing the current clan-event state in-client
+
+In short: the original notifier foundation is still here, but this fork adds a layer focused on organizing clan events, importing event settings, and routing notifications around those events.
+
 Tangle Crew Plugin sends webhook messages for noteworthy Old School RuneScape events.
 It supports Discord webhooks, custom webhook handlers, rich embeds, screenshots, metadata, and a clan-event workflow that can temporarily override your normal webhook routing.
 
