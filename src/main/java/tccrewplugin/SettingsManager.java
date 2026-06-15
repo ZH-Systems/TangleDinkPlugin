@@ -44,9 +44,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.SwingUtilities;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,11 +73,9 @@ public class SettingsManager {
     public static final String DYNAMIC_IMPORT_CONFIG_KEY = "dynamicConfigUrl";
 
     private static final Set<Integer> PROBLEMATIC_VARBITS;
+    private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
-    /**
-     * Maps our setting keys to their type for safe serialization and deserialization.
-     */
-    private final Map<String, Type> configValueTypes = new HashMap<>();
+    private final Set<String> knownConfigKeys = new HashSet<>();
 
     /**
      * Maps section names to the corresponding config item keys to allow for selective export.
@@ -157,14 +155,14 @@ public class SettingsManager {
 
     @Synchronized
     private void loadConfigMetadata() {
-        if (!configValueTypes.isEmpty()) {
+        if (!knownConfigKeys.isEmpty()) {
             return;
         }
 
         setFilteredNames(config.filteredNames());
         configManager.getConfigDescriptor(config).getItems().forEach(item -> {
             String key = item.key();
-            configValueTypes.put(key, item.getType());
+            knownConfigKeys.add(key);
 
             if (item.getItem().hidden()) {
                 hiddenConfigKeys.add(key);
@@ -185,7 +183,7 @@ public class SettingsManager {
             .addAll(keysBySection.getOrDefault(DinkPluginConfig.webhookSection.toLowerCase().replace(" ", ""), Collections.emptySet()))
             .add("metadataWebhook") // MetaNotifier's configuration is in the Advanced section
             .build();
-        exactOverwriteConfigKeys = configValueTypes.keySet()
+        exactOverwriteConfigKeys = knownConfigKeys
             .stream()
             .filter(key -> key.endsWith("Webhook") || "clanEventEnabled".equals(key) || "clanEventEndTime".equals(key) || "clanEventSecretCode".equals(key))
             .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -395,17 +393,12 @@ public class SettingsManager {
     boolean applyConfigValue(@NotNull String key, @NotNull Object rawValue) {
         loadConfigMetadata();
 
-        Type valueType = configValueTypes.get(key);
-        if (valueType == null || hiddenConfigKeys.contains(key)) {
+        if (!knownConfigKeys.contains(key) || hiddenConfigKeys.contains(key)) {
             return false;
         }
 
-        Object value = convertTypeFromJson(gson, valueType, rawValue);
-        if (value == null) {
-            return false;
-        }
-
-        Object prevValue = configManager.getConfiguration(CONFIG_GROUP, key, valueType);
+        String value = toRawConfigValue(gson, rawValue);
+        String prevValue = configManager.getConfiguration(CONFIG_GROUP, key);
         if (Objects.equals(prevValue, value)) {
             return true;
         }
@@ -465,7 +458,7 @@ public class SettingsManager {
     }
 
     private void migrateConfig(MigrationUtil.Metadata data) {
-        applyImportedConfig(data.readConfig(configManager, configValueTypes), true);
+        applyImportedConfig(data.readConfig(configManager), true);
         if (data.shouldEnableNotifier(configManager)) {
             configManager.setConfiguration(CONFIG_GROUP, data.notifierEnabledKey(), true);
         }
@@ -492,7 +485,7 @@ public class SettingsManager {
 
                 Map<String, Object> map;
                 try {
-                    map = gson.fromJson(body.charStream(), new TypeToken<Map<String, Object>>() {}.getType());
+                    map = gson.fromJson(body.charStream(), MAP_TYPE);
                 } catch (Exception e) {
                     log.warn("Could not deserialize dynamic config", e);
                     plugin.addChatWarning("Failed to parse settings from the Dynamic Config URL");
@@ -530,9 +523,8 @@ public class SettingsManager {
             .map(prop -> prop.substring(prefix.length()))
             .filter(key -> !hiddenConfigKeys.contains(key))
             .filter(exportKey)
-            .map(key -> Pair.of(key, configValueTypes.get(key)))
-            .filter(pair -> pair.getValue() != null)
-            .map(pair -> Pair.of(pair.getKey(), configManager.getConfiguration(CONFIG_GROUP, pair.getKey(), pair.getValue())))
+            .filter(knownConfigKeys::contains)
+            .map(key -> Pair.of(key, configManager.getConfiguration(CONFIG_GROUP, key)))
             .filter(pair -> pair.getValue() != null)
             .filter(pair -> {
                 // only serialize webhook urls if they are not blank
@@ -560,14 +552,14 @@ public class SettingsManager {
     @Synchronized
     private void importConfig() {
         Utils.readClipboard()
-            .thenApplyAsync(json -> {
+            .<Map<String, Object>>thenApplyAsync(json -> {
                 if (json == null || json.isEmpty()) {
                     plugin.addChatWarning("Clipboard was empty");
                     return null;
                 }
 
                 try {
-                    return gson.<Map<String, Object>>fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+                    return gson.fromJson(json, MAP_TYPE);
                 } catch (Exception e) {
                     String warning = "Failed to parse config from clipboard";
                     log.warn(warning, e);
@@ -575,7 +567,7 @@ public class SettingsManager {
                     return null;
                 }
             })
-            .thenAcceptAsync(m -> applyImportedConfig(m, false))
+            .thenAcceptAsync(map -> applyImportedConfig(map, false))
             .exceptionally(e -> {
                 plugin.addChatWarning("Failed to read clipboard");
                 return null;
@@ -592,8 +584,7 @@ public class SettingsManager {
         AtomicInteger numUpdated = new AtomicInteger();
         Collection<String> mergedConfigs = new TreeSet<>();
         map.forEach((key, rawValue) -> {
-            Type valueType = configValueTypes.get(key);
-            if (valueType == null) {
+            if (!knownConfigKeys.contains(key)) {
                 log.debug("Encountered unrecognized config mapping during import: {} = {}", key, rawValue);
                 return;
             }
@@ -608,14 +599,9 @@ public class SettingsManager {
                 return;
             }
 
-            Object value = convertTypeFromJson(gson, valueType, rawValue);
-            if (value == null) {
-                log.debug("Encountered config value with incorrect type: {} = {}", key, rawValue);
-                return;
-            }
-
-            Object prevValue = configManager.getConfiguration(CONFIG_GROUP, key, valueType);
-            Object newValue;
+            String value = toRawConfigValue(gson, rawValue);
+            String prevValue = configManager.getConfiguration(CONFIG_GROUP, key);
+            String newValue;
 
             if (exactOverwriteConfigKeys.contains(key)) {
                 if (Objects.equals(value, prevValue)) {
@@ -625,12 +611,10 @@ public class SettingsManager {
                 }
             } else if (shouldMerge(policies, key)) {
                 // special case: multi-line configs that should be merged (rather than replaced)
-                assert prevValue == null || prevValue instanceof String;
-                Collection<String> lines = readDelimited((String) prevValue).collect(Collectors.toCollection(LinkedHashSet::new));
+                Collection<String> lines = readDelimited(prevValue).collect(Collectors.toCollection(LinkedHashSet::new));
 
                 int oldCount = lines.size();
-                assert value instanceof String;
-                long added = readDelimited((String) value)
+                long added = readDelimited(value)
                     .map(lines::add)
                     .filter(Boolean::booleanValue)
                     .count();
@@ -682,7 +666,7 @@ public class SettingsManager {
     @Synchronized
     void clearConfigValue(String key) {
         loadConfigMetadata();
-        if (!configValueTypes.containsKey(key)) {
+        if (!knownConfigKeys.contains(key)) {
             return;
         }
 

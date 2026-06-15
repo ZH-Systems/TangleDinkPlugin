@@ -3,7 +3,6 @@ package tccrewplugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 import lombok.Data;
 import lombok.Value;
 import net.runelite.api.gameval.ItemID;
@@ -57,7 +56,8 @@ class RarityCalculator {
             if (!response.isSuccessful() || response.body() == null) {
                 throw new RuntimeException("Could not read parsed monsters file");
             }
-            monsters = gson.fromJson(response.body().charStream(), new TypeToken<List<Monster>>() {}.getType());
+            Monster[] parsed = gson.fromJson(response.body().charStream(), Monster[].class);
+            monsters = parsed == null ? Collections.emptyList() : List.of(parsed);
         }
 
         SortedMap<String, Collection<Transformed>> map = new TreeMap<>();

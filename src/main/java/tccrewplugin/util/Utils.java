@@ -2,7 +2,6 @@ package tccrewplugin.util;
 
 import com.google.common.hash.HashCode;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import tccrewplugin.DinkPluginConfig;
 import tccrewplugin.domain.AccountType;
 import tccrewplugin.domain.ChatPrivacyMode;
@@ -374,8 +373,8 @@ public class Utils {
         return future;
     }
 
-    public <T> CompletableFuture<T> readJson(@NotNull OkHttpClient httpClient, @NotNull Gson gson, @NotNull String url, @NotNull TypeToken<T> type) {
-        return readUrl(httpClient, url, reader -> gson.fromJson(reader, type.getType()));
+    public <T> CompletableFuture<T> readJson(@NotNull OkHttpClient httpClient, @NotNull Gson gson, @NotNull String url, @NotNull Class<T> type) {
+        return readUrl(httpClient, url, reader -> gson.fromJson(reader, type));
     }
 
     public <T> CompletableFuture<T> readUrl(@NotNull OkHttpClient httpClient, @NotNull String url, @NotNull Function<Reader, T> transformer) {

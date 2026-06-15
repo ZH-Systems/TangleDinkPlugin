@@ -1,7 +1,7 @@
 package tccrewplugin.util;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
@@ -83,24 +83,28 @@ public class ItemSearcher {
      * @return a mapping of item ids to their in-game names, provided by the RuneLite API
      */
     private CompletableFuture<Map<Integer, String>> queryNamesById() {
-        return queryCache("names.json", new TypeToken<Map<Integer, String>>() {});
+        return Utils.readUrl(httpClient, ItemUtils.ITEM_CACHE_BASE_URL + "names.json", reader -> {
+            JsonObject json = gson.fromJson(reader, JsonObject.class);
+            Map<Integer, String> namesById = new HashMap<>();
+            if (json != null) {
+                json.entrySet().forEach(entry -> namesById.put(Integer.parseInt(entry.getKey()), entry.getValue().getAsString()));
+            }
+            return namesById;
+        });
     }
 
     /**
      * @return a set of id's of noted items, provided by the RuneLite API
      */
     private CompletableFuture<Set<Integer>> queryNotedItemIds() {
-        return queryCache("notes.json", new TypeToken<Map<Integer, Integer>>() {})
-            .thenApply(Map::keySet);
-    }
-
-    /**
-     * @param fileName the name of the file to query from RuneLite's cache
-     * @param type     a type token that indicates how the json response should be parsed
-     * @return the transformed cache response, wrapped in a future
-     */
-    private <T> CompletableFuture<T> queryCache(@NotNull String fileName, @NotNull TypeToken<T> type) {
-        return Utils.readJson(httpClient, gson, ItemUtils.ITEM_CACHE_BASE_URL + fileName, type);
+        return Utils.readUrl(httpClient, ItemUtils.ITEM_CACHE_BASE_URL + "notes.json", reader -> {
+            JsonObject json = gson.fromJson(reader, JsonObject.class);
+            Set<Integer> notedIds = new java.util.HashSet<>();
+            if (json != null) {
+                json.keySet().forEach(key -> notedIds.add(Integer.parseInt(key)));
+            }
+            return notedIds;
+        });
     }
 }
 

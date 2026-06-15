@@ -13,7 +13,6 @@ import lombok.experimental.UtilityClass;
 import net.runelite.client.config.ConfigManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -244,13 +243,10 @@ public class MigrationUtil {
         @NonNull
         Set<String> aliases;
 
-        public Map<String, Object> readConfig(ConfigManager configManager, Map<String, Type> configValueTypes) {
+        public Map<String, Object> readConfig(ConfigManager configManager) {
             Map<String, Object> valuesByKey = new HashMap<>(mappings.size() * 4 / 3);
             mappings.forEach((sourceKey, dinkKey) -> {
-                Type valueType = configValueTypes.get(dinkKey);
-                if (valueType == null) return;
-
-                var sourceValue = configManager.getConfiguration(configGroup, sourceKey, valueType);
+                var sourceValue = configManager.getConfiguration(configGroup, sourceKey);
                 if (sourceValue != null) {
                     var transformedValue = transform(sourceKey, sourceValue);
                     valuesByKey.put(dinkKey, transformedValue);

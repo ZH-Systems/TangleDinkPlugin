@@ -1,7 +1,6 @@
 package tccrewplugin;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import tccrewplugin.domain.RemoteEventConfig;
 import tccrewplugin.domain.RemoteEventMigration;
 import tccrewplugin.util.ConfigProxyAuth;
@@ -209,7 +208,7 @@ public class RemoteEventManager {
             return failedFuture("Remote event config URL must be a valid HTTPS URL.");
         }
 
-        return Utils.readJson(httpClient, gson, httpUrl.toString(), new TypeToken<RemoteEventConfig>() {})
+        return Utils.readJson(httpClient, gson, httpUrl.toString(), RemoteEventConfig.class)
             .thenApply(this::validateRemoteConfig)
             .exceptionally(t -> {
                 Throwable cause = unwrap(t);
@@ -282,7 +281,7 @@ public class RemoteEventManager {
             return failedFuture("The remote event migration host is not allowlisted.");
         }
 
-        return Utils.readJson(httpClient, gson, url.toString(), new TypeToken<RemoteEventMigration>() {})
+        return Utils.readJson(httpClient, gson, url.toString(), RemoteEventMigration.class)
             .thenApply(migration -> validateMigration(event, migration))
             .exceptionally(t -> {
                 Throwable cause = unwrap(t);

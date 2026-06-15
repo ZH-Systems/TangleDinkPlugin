@@ -1,8 +1,10 @@
 package tccrewplugin.util;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -34,7 +36,15 @@ public abstract class AbstractRarityService {
         Map<String, List<RawDrop>> raw;
         try (InputStream is = getClass().getResourceAsStream(resourceName);
              Reader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-            raw = gson.fromJson(reader, new TypeToken<Map<String, List<RawDrop>>>() {}.getType());
+            JsonObject root = gson.fromJson(reader, JsonObject.class);
+            raw = new HashMap<>();
+            if (root != null) {
+                for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
+                    JsonArray array = entry.getValue().getAsJsonArray();
+                    RawDrop[] drops = gson.fromJson(array, RawDrop[].class);
+                    raw.put(entry.getKey(), drops == null ? Collections.emptyList() : Arrays.asList(drops));
+                }
+            }
         } catch (Exception e) {
             log.error("Failed to read monster drop rates", e);
             return;

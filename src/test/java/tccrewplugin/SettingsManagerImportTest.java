@@ -12,7 +12,6 @@ import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -119,12 +118,14 @@ class SettingsManagerImportTest {
     }
 
     private static ConfigItemDescriptor descriptor(String methodName) {
-        try {
-            Method method = DinkPluginConfig.class.getMethod(methodName);
-            ConfigItem item = method.getAnnotation(ConfigItem.class);
-            return new ConfigItemDescriptor(item, method.getGenericReturnType(), null, null, null);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
-        }
+        ConfigItem item = mock(ConfigItem.class);
+        when(item.keyName()).thenReturn(methodName);
+        when(item.hidden()).thenReturn(false);
+        when(item.section()).thenReturn("");
+
+        ConfigItemDescriptor descriptor = mock(ConfigItemDescriptor.class);
+        when(descriptor.getItem()).thenReturn(item);
+        when(descriptor.key()).thenReturn(methodName);
+        return descriptor;
     }
 }

@@ -13,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -38,87 +36,26 @@ public class ConfigUtil {
     }
 
     @Nullable
-    public Object convertTypeFromJson(@NotNull Gson gson, @NotNull Type type, @NotNull Object in) {
-        if (in instanceof Boolean)
-            return type == boolean.class || type == Boolean.class ? in : null;
-
-        if (in instanceof Number) {
-            Number n = (Number) in;
-
-            if (type == int.class || type == Integer.class)
-                return n.intValue();
-
-            if (type == long.class || type == Long.class)
-                return n.longValue();
-
-            if (type == float.class || type == Float.class)
-                return n.floatValue();
-
-            if (type == double.class || type == Double.class)
-                return n.doubleValue();
-
-            if (type == byte.class || type == Byte.class)
-                return n.byteValue();
-
-            if (type == short.class || type == Short.class)
-                return n.shortValue();
-
-            if (type == Instant.class)
-                return Instant.ofEpochMilli(n.longValue());
-
-            if (type == Duration.class)
-                return Duration.ofMillis(n.longValue());
-
-            return null;
-        }
-
+    public String toRawConfigValue(@NotNull Gson gson, @NotNull Object in) {
         if (in instanceof String) {
-            String s = (String) in;
-
-            if (type == String.class)
-                return s;
-
-            if (type == Color.class)
-                return ColorUtil.fromHex(s);
-
-            if (type instanceof Class && ((Class<?>) type).isEnum()) {
-                try {
-                    // noinspection unchecked,rawtypes
-                    return Enum.valueOf((Class<? extends Enum>) type, s);
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-
-            if (type == Instant.class) {
-                try {
-                    return Instant.parse(s);
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-
-            if (type == Duration.class) {
-                try {
-                    return Duration.parse(s);
-                } catch (Exception e) {
-                    return null;
-                }
-            }
+            return (String) in;
         }
-
-        if (in instanceof Collection && type instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) type).getRawType();
-            if (rawType instanceof Class && Collection.class.isAssignableFrom((Class<?>) rawType)) {
-                try {
-                    return gson.fromJson(gson.toJson(in), type); // inefficient, but unimportant
-                } catch (Exception e) {
-                    return null;
-                }
-            }
+        if (in instanceof Number || in instanceof Boolean || in instanceof Character) {
+            return String.valueOf(in);
         }
-
-        return null;
+        if (in instanceof Enum<?>) {
+            return ((Enum<?>) in).name();
+        }
+        if (in instanceof Color) {
+            return ColorUtil.colorToHexCode((Color) in);
+        }
+        if (in instanceof Instant || in instanceof Duration) {
+            return in.toString();
+        }
+        if (in instanceof Collection<?>) {
+            return gson.toJson(in);
+        }
+        return gson.toJson(in);
     }
 
     public boolean isSettingsOpen(@NotNull Client client) {

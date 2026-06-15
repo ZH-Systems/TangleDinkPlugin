@@ -22,7 +22,6 @@ import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 import net.runelite.api.ParamID;
 import net.runelite.api.Player;
-import net.runelite.api.Prayer;
 import net.runelite.api.SkullIcon;
 import net.runelite.api.events.ActorDeath;
 import net.runelite.api.events.InteractingChanged;
@@ -324,7 +323,7 @@ public class DeathNotifier extends BaseNotifier {
 
         var skull = client.getLocalPlayer().getSkullIcon();
         int keepCount = skull == SkullIcon.NONE ? 3 : 0;
-        if (client.isPrayerActive(Prayer.PROTECT_ITEM))
+        if (client.getVarbitValue(VarbitID.PRAYER_PROTECTITEM) > 0)
             keepCount++;
         return keepCount;
     }
@@ -339,6 +338,10 @@ public class DeathNotifier extends BaseNotifier {
             (client.getVarbitValue(VarbitID.INSIDE_WILDERNESS) > 0 || WorldUtils.isPvpWorld(client.getWorldType()));
 
         Player localPlayer = client.getLocalPlayer();
+        var worldView = client.getWorldView(client.getPlane());
+        if (worldView == null) {
+            return null;
+        }
         Predicate<Actor> interacting = a -> INTERACTING.test(localPlayer, a);
 
         // O(1) fast path based on last outbound interaction
@@ -348,7 +351,7 @@ public class DeathNotifier extends BaseNotifier {
 
         // find another player interacting with us (that is preferably not a friend or clan member)
         if (pvpEnabled) {
-            Optional<? extends Player> pker = client.getTopLevelWorldView().players().stream()
+            Optional<? extends Player> pker = worldView.players().stream()
                 .filter(interacting)
                 .min(PK_COMPARATOR.apply(localPlayer)); // O(n)
             if (pker.isPresent())
@@ -356,7 +359,7 @@ public class DeathNotifier extends BaseNotifier {
         }
 
         // otherwise search through NPCs interacting with us
-        return client.getTopLevelWorldView().npcs().stream()
+        return worldView.npcs().stream()
             .filter(interacting)
             .filter(npc -> NPC_VALID.test(npc.getTransformedComposition()))
             .min(NPC_COMPARATOR.apply(npcManager, localPlayer)) // O(n)
