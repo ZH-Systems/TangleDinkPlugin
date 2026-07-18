@@ -1,0 +1,14 @@
+package tccrewplugin.sync;
+
+public enum SyncStatus
+{
+	DISABLED,
+	WAITING_FOR_LOGIN,
+	WAITING_FOR_MANIFEST,
+	IDLE,
+	READING_CLIENT_STATE,
+	SUBMITTING,
+	BACKING_OFF,
+	SUCCESS,
+	ERROR
+}

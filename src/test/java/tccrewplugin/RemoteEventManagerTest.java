@@ -8,6 +8,8 @@ import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import tccrewplugin.domain.RemoteEventConfig;
+import tccrewplugin.domain.RemoteEventMigration;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
