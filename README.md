@@ -1,4 +1,4 @@
-# Tangle Dink Plugin
+# Tangle Dink Plugin 
 
 Tangle Dink Plugin combines two workflows in one RuneLite sidebar entry:
 
