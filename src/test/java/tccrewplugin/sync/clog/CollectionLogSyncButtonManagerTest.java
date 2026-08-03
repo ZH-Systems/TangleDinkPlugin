@@ -5,7 +5,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetPositionMode;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
@@ -59,7 +58,6 @@ class CollectionLogSyncButtonManagerTest
 	@Test
 	void missingNativeWidgetsDoNothing()
 	{
-		when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(null);
 		when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(null);
 
 		CollectionLogSyncButtonManager manager = new CollectionLogSyncButtonManager(client, clientThread, eventBus, config, syncManager);
@@ -111,7 +109,6 @@ class CollectionLogSyncButtonManagerTest
 		});
 		when(root.createChild(anyInt(), eq(net.runelite.api.widgets.WidgetType.TEXT))).thenReturn(text);
 
-		when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(parent);
 		when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(parent);
 
 		CollectionLogSyncButtonManager manager = new CollectionLogSyncButtonManager(client, clientThread, eventBus, config, syncManager);
@@ -151,7 +148,6 @@ class CollectionLogSyncButtonManagerTest
 		when(topBar.getOriginalHeight()).thenReturn(18);
 		when(topBar.getOriginalY()).thenReturn(3);
 		when(topBar.getYPositionMode()).thenReturn(WidgetPositionMode.ABSOLUTE_TOP);
-		when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(parent);
 		when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(parent);
 
 		CollectionLogSyncButtonManager manager = new CollectionLogSyncButtonManager(client, clientThread, eventBus, config, syncManager);

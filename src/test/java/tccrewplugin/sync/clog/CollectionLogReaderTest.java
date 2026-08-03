@@ -5,7 +5,6 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import tccrewplugin.sync.model.CollectionLogSnapshot;
@@ -36,11 +35,11 @@ class CollectionLogReaderTest
         Widget raidContainer = Mockito.mock(Widget.class);
         ItemComposition itemComposition = Mockito.mock(ItemComposition.class);
 
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(collectionLog);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY)).thenReturn(entry);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_HEADER)).thenReturn(header);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS)).thenReturn(itemsContainer);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_TABS)).thenReturn(tabs);
+        when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(collectionLog);
+        when(client.getWidget(InterfaceID.Collection.LIST)).thenReturn(entry);
+        when(client.getWidget(InterfaceID.Collection.HEADER_TEXT)).thenReturn(header);
+        when(client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS)).thenReturn(itemsContainer);
+        when(client.getWidget(InterfaceID.Collection.TABS)).thenReturn(tabs);
         when(client.getWidget(InterfaceID.Collection.BOSS_CONTAINER)).thenReturn(bossContainer);
         when(client.getWidget(InterfaceID.Collection.RAID_CONTAINER)).thenReturn(raidContainer);
         when(client.getVarpValue(VarPlayerID.COLLECTION_COUNT)).thenReturn(742);
@@ -134,7 +133,7 @@ class CollectionLogReaderTest
     void returnsNotLoadedWhenCollectionLogIsClosed()
     {
         Client client = Mockito.mock(Client.class);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(null);
+        when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(null);
 
         CollectionLogReader reader = new CollectionLogReader();
         CollectionLogSnapshot snapshot = reader.read(client, Instant.parse("2026-08-03T03:15:00Z"));
@@ -153,10 +152,10 @@ class CollectionLogReaderTest
         Widget itemsContainer = Mockito.mock(Widget.class);
         Widget itemWidget = Mockito.mock(Widget.class);
 
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(collectionLog);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_HEADER)).thenReturn(header);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS)).thenReturn(itemsContainer);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_TABS)).thenReturn(tabs);
+        when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(collectionLog);
+        when(client.getWidget(InterfaceID.Collection.HEADER_TEXT)).thenReturn(header);
+        when(client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS)).thenReturn(itemsContainer);
+        when(client.getWidget(InterfaceID.Collection.TABS)).thenReturn(tabs);
         when(client.getVarpValue(VarPlayerID.COLLECTION_COUNT)).thenReturn(12);
         when(client.getVarpValue(VarPlayerID.COLLECTION_COUNT_MAX)).thenReturn(99);
 
@@ -215,10 +214,10 @@ class CollectionLogReaderTest
         Widget modelWidget = Mockito.mock(Widget.class);
         ItemComposition itemComposition = Mockito.mock(ItemComposition.class);
 
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(collectionLog);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_HEADER)).thenReturn(header);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS)).thenReturn(itemsContainer);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_TABS)).thenReturn(tabs);
+        when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(collectionLog);
+        when(client.getWidget(InterfaceID.Collection.HEADER_TEXT)).thenReturn(header);
+        when(client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS)).thenReturn(itemsContainer);
+        when(client.getWidget(InterfaceID.Collection.TABS)).thenReturn(tabs);
         when(client.getVarpValue(VarPlayerID.COLLECTION_COUNT)).thenReturn(5);
         when(client.getVarpValue(VarPlayerID.COLLECTION_COUNT_MAX)).thenReturn(10);
         when(client.getItemDefinition(12922)).thenReturn(itemComposition);

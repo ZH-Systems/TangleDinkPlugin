@@ -5,7 +5,6 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetType;
 import org.apache.commons.lang3.StringUtils;
 import tccrewplugin.sync.model.CollectionLogItem;
@@ -40,11 +39,11 @@ public class CollectionLogReader
 
     public CollectionLogSnapshot read(Client client, Instant capturedAt)
     {
-        Widget collectionLog = client.getWidget(WidgetInfo.COLLECTION_LOG);
-        Widget entry = getWidget(client, WidgetInfo.COLLECTION_LOG_ENTRY, InterfaceID.Collection.LIST);
-        Widget header = getWidget(client, WidgetInfo.COLLECTION_LOG_ENTRY_HEADER, InterfaceID.Collection.HEADER_TEXT);
-        Widget itemsContainer = getWidget(client, WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS, InterfaceID.Collection.ITEMS_CONTENTS);
-        Widget tabs = getWidget(client, WidgetInfo.COLLECTION_LOG_TABS, InterfaceID.Collection.TABS);
+        Widget collectionLog = client.getWidget(InterfaceID.Collection.UNIVERSE);
+        Widget entry = getWidget(client, InterfaceID.Collection.LIST);
+        Widget header = getWidget(client, InterfaceID.Collection.HEADER_TEXT);
+        Widget itemsContainer = getWidget(client, InterfaceID.Collection.ITEMS_CONTENTS);
+        Widget tabs = getWidget(client, InterfaceID.Collection.TABS);
 
         if (collectionLog == null || header == null || itemsContainer == null)
         {
@@ -242,17 +241,6 @@ public class CollectionLogReader
     private String firstNonBlank(String first, String second)
     {
         return StringUtils.isNotBlank(first) ? first : second;
-    }
-
-    private Widget getWidget(Client client, WidgetInfo widgetInfo, int componentId)
-    {
-        Widget widget = client.getWidget(widgetInfo);
-        if (widget != null)
-        {
-            return widget;
-        }
-
-        return client.getWidget(componentId);
     }
 
     private Widget getWidget(Client client, int componentId)

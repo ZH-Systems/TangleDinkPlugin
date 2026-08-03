@@ -11,7 +11,6 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetPositionMode;
 import net.runelite.api.widgets.WidgetTextAlignment;
 import net.runelite.api.widgets.WidgetType;
@@ -174,7 +173,7 @@ public class CollectionLogSyncButtonManager
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (event.getGroupId() == WidgetInfo.COLLECTION_LOG.getGroupId())
+		if (event.getGroupId() == InterfaceID.COLLECTION_OVERVIEW)
 		{
 			clientThread.invokeLater(this::tryAddButton);
 		}
@@ -183,7 +182,7 @@ public class CollectionLogSyncButtonManager
 	@Subscribe
 	public void onWidgetClosed(WidgetClosed event)
 	{
-		if (event.getGroupId() == WidgetInfo.COLLECTION_LOG.getGroupId())
+		if (event.getGroupId() == InterfaceID.COLLECTION_OVERVIEW)
 		{
 			clientThread.invokeLater(this::removeButton);
 		}

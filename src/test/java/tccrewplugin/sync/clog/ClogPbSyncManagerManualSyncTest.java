@@ -10,8 +10,8 @@ import net.runelite.api.ScriptEvent;
 import net.runelite.api.StructComposition;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
@@ -80,10 +80,10 @@ class ClogPbSyncManagerManualSyncTest
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         Player player = mock(Player.class);
         when(client.getLocalPlayer()).thenReturn(player);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG)).thenReturn(collectionLogWidget);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY)).thenReturn(null);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS)).thenReturn(null);
-        when(client.getWidget(WidgetInfo.COLLECTION_LOG_TABS)).thenReturn(null);
+        when(client.getWidget(InterfaceID.Collection.UNIVERSE)).thenReturn(collectionLogWidget);
+        when(client.getWidget(InterfaceID.Collection.LIST)).thenReturn(null);
+        when(client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS)).thenReturn(null);
+        when(client.getWidget(InterfaceID.Collection.TABS)).thenReturn(null);
         when(webhookClient.hasPendingWork()).thenReturn(false);
         when(executor.schedule(any(Runnable.class), Mockito.anyLong(), Mockito.eq(TimeUnit.MILLISECONDS)))
             .thenAnswer(invocation -> mock(ScheduledFuture.class));

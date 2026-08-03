@@ -26,7 +26,6 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.EnumComposition;
 import net.runelite.api.StructComposition;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
@@ -847,9 +846,9 @@ public class ClogPbSyncManager
 
     private boolean isCollectionLogOpen()
     {
-        return client.getWidget(net.runelite.api.widgets.WidgetInfo.COLLECTION_LOG) != null
-            || client.getWidget(net.runelite.api.widgets.WidgetInfo.COLLECTION_LOG_ENTRY) != null
-            || client.getWidget(net.runelite.api.widgets.WidgetInfo.COLLECTION_LOG_ENTRY_ITEMS) != null;
+        return client.getWidget(InterfaceID.Collection.UNIVERSE) != null
+            || client.getWidget(InterfaceID.Collection.LIST) != null
+            || client.getWidget(InterfaceID.Collection.ITEMS_CONTENTS) != null;
     }
 
     private void syncCollectionLog(String command)
@@ -881,7 +880,7 @@ public class ClogPbSyncManager
         {
             enqueueManualCollectionNavigationTargets(
                 discoverManualCollectionNavigationTargets(
-                    client.getWidget(WidgetInfo.COLLECTION_LOG_TABS),
+                    client.getWidget(InterfaceID.Collection.TABS),
                     ManualCollectionNavigationKind.TAB,
                     "tabs"));
         }
@@ -894,7 +893,7 @@ public class ClogPbSyncManager
             return;
         }
 
-        Widget entryContainer = client.getWidget(WidgetInfo.COLLECTION_LOG_ENTRY);
+        Widget entryContainer = client.getWidget(InterfaceID.Collection.LIST);
         if (entryContainer == null)
         {
             return;
@@ -1143,7 +1142,7 @@ public class ClogPbSyncManager
 
     private String readCurrentCollectionLogTabLabel()
     {
-        Widget tabs = client.getWidget(WidgetInfo.COLLECTION_LOG_TABS);
+        Widget tabs = client.getWidget(InterfaceID.Collection.TABS);
         if (tabs == null)
         {
             return null;
