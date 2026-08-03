@@ -179,13 +179,19 @@ public class SettingsManager {
         hiddenConfigKeys.add("importPolicy"); // not hidden, but shouldn't be overwritten
         webhookConfigKeys = ImmutableSet.<String>builder()
             .add("discordWebhook") // DinkPluginConfig#primaryWebhook
-            .add("clanEventWebhook") // DinkPluginConfig#clanEventWebhook
-            .addAll(keysBySection.getOrDefault(DinkPluginConfig.webhookSection.toLowerCase().replace(" ", ""), Collections.emptySet()))
-            .add("metadataWebhook") // MetaNotifier's configuration is in the Advanced section
+            .add("clanEventWebhook")
+            .add("clogPbWebhookUrl")
+            .addAll(knownConfigKeys.stream()
+                .filter(key -> key.endsWith("Webhook"))
+                .collect(Collectors.toSet()))
             .build();
         exactOverwriteConfigKeys = knownConfigKeys
             .stream()
-            .filter(key -> key.endsWith("Webhook") || "clanEventEnabled".equals(key) || "clanEventEndTime".equals(key) || "clanEventSecretCode".equals(key))
+            .filter(key -> key.endsWith("Webhook")
+                || "clogPbWebhookUrl".equals(key)
+                || "clanEventEnabled".equals(key)
+                || "clanEventEndTime".equals(key)
+                || "clanEventSecretCode".equals(key))
             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

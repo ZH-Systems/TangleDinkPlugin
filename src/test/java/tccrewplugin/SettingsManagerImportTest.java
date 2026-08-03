@@ -83,14 +83,14 @@ class SettingsManagerImportTest {
 
     @Test
     void importedClanEventEnabledFalseOverwritesTrue() {
-        when(configManager.getConfiguration(eq(SettingsManager.CONFIG_GROUP), eq("clanEventEnabled"), eq(boolean.class))).thenReturn(true);
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "clanEventEnabled")).thenReturn("true");
 
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("clanEventEnabled", false);
 
         settingsManager.applyImportedConfig(map, true);
 
-        verify(configManager).setConfiguration(SettingsManager.CONFIG_GROUP, "clanEventEnabled", false);
+        verify(configManager).setConfiguration(SettingsManager.CONFIG_GROUP, "clanEventEnabled", "false");
     }
 
     @Test
@@ -107,7 +107,7 @@ class SettingsManagerImportTest {
 
     @Test
     void importedNonWebhookSettingsStillMerge() {
-        when(configManager.getConfiguration(eq(SettingsManager.CONFIG_GROUP), eq("ignoredNames"), eq(String.class))).thenReturn("alice");
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "ignoredNames")).thenReturn("alice");
 
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("ignoredNames", "bob");
@@ -123,9 +123,7 @@ class SettingsManagerImportTest {
         when(item.hidden()).thenReturn(false);
         when(item.section()).thenReturn("");
 
-        ConfigItemDescriptor descriptor = mock(ConfigItemDescriptor.class);
-        when(descriptor.getItem()).thenReturn(item);
-        when(descriptor.key()).thenReturn(methodName);
-        return descriptor;
+        Class<?> type = "clanEventEnabled".equals(methodName) ? boolean.class : String.class;
+        return new ConfigItemDescriptor(item, type, null, null, null);
     }
 }

@@ -13,7 +13,7 @@ repositories {
 	mavenCentral()
 }
 
-def lombokVersion = '1.18.38'
+def lombokVersion = '1.18.46'
 def runeLiteVersion = 'latest.' + (project.hasProperty('use.snapshot') ? 'integration' : 'release')
 def junitVersion = '5.5.2'
 def devSideloadDir = file("${System.getProperty('user.home')}/.runelite/sideloaded-plugins")

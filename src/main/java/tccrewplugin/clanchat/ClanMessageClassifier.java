@@ -1,89 +1,81 @@
 package tccrewplugin.clanchat;
 
-import tccrewplugin.clanchat.model.ClanMessageRecord;
-import tccrewplugin.clanchat.model.ClanMessageType;
-import tccrewplugin.util.TextSanitizer;
+import lombok.experimental.UtilityClass;
+import net.runelite.api.ChatMessageType;
 
-import java.time.Instant;
 import java.util.Locale;
-import java.util.UUID;
 
+@UtilityClass
 public class ClanMessageClassifier
 {
-	public ClanMessageRecord classify(
-		String chatTypeName,
-		String sender,
-		String senderRank,
-		String clanName,
-		String messageText,
-		Integer world,
-		boolean guest,
-		Instant occurredAt,
-		boolean test
-	)
+	public SystemMessageType getSystemMessageType(String message, ChatMessageType messageType)
 	{
-		String stripped = TextSanitizer.stripTags(messageText);
-		ClanMessageType type = classifyType(chatTypeName, stripped, guest);
-		String normalizedSender = TextSanitizer.normalizeRuneScapeName(sender);
-		String normalizedClan = TextSanitizer.normalizeClanName(clanName);
-		String fingerprint = fingerprint(type, normalizedSender, normalizedClan, TextSanitizer.normalizeRuneScapeName(stripped), world, occurredAt, guest);
-		return new ClanMessageRecord(
-			UUID.nameUUIDFromBytes(fingerprint.getBytes(java.nio.charset.StandardCharsets.UTF_8)),
-			occurredAt == null ? Instant.now() : occurredAt,
-			type,
-			TextSanitizer.stripTags(sender),
-			TextSanitizer.stripTags(senderRank),
-			stripped,
-			guest,
-			TextSanitizer.stripTags(clanName),
-			world,
-			fingerprint,
-			test
-		);
-	}
-
-	private ClanMessageType classifyType(String chatTypeName, String messageText, boolean guest)
-	{
-		String type = chatTypeName == null ? "" : chatTypeName.trim().toUpperCase(Locale.ROOT);
-		if (type.contains("CLAN") && type.contains("BROADCAST"))
+		if (messageType != ChatMessageType.CLAN_MESSAGE)
 		{
-			return guest ? ClanMessageType.GUEST_BROADCAST : ClanMessageType.CLAN_BROADCAST;
+			return SystemMessageType.NORMAL;
 		}
-		if (type.contains("CLAN") && type.contains("SYSTEM"))
-		{
-			return ClanMessageType.SYSTEM;
-		}
-		if (type.contains("CLAN") && (type.contains("CHAT") || type.contains("MESSAGE")))
-		{
-			return ClanMessageType.CHAT;
-		}
-		if (looksLikeBroadcast(messageText))
-		{
-			return guest ? ClanMessageType.GUEST_BROADCAST : ClanMessageType.CLAN_BROADCAST;
-		}
-		return ClanMessageType.UNKNOWN;
-	}
 
-	private boolean looksLikeBroadcast(String messageText)
-	{
-		String normalized = TextSanitizer.normalizeRuneScapeName(messageText);
-		return normalized.contains("just received")
-			|| normalized.contains("completed a")
-			|| normalized.contains("leveled up")
-			|| normalized.contains("completed the quest")
-			|| normalized.contains("received a new collection log item")
-			|| normalized.contains("completed a combat achievement")
-			|| normalized.contains("obtained");
-	}
+		String text = message == null ? "" : message.toLowerCase(Locale.ENGLISH);
 
-	public String fingerprint(ClanMessageRecord record)
-	{
-		return record.getFingerprint();
-	}
+		if (text.contains("to talk in your clan's channel, start each line of chat with"))
+		{
+			return SystemMessageType.LOGIN;
+		}
+		if (text.contains("received special loot from a raid:"))
+		{
+			return SystemMessageType.RAID_DROP;
+		}
+		if (text.contains("received a new collection log item:"))
+		{
+			return SystemMessageType.COLLECTION_LOG;
+		}
+		if (text.contains("received a clue item:"))
+		{
+			return SystemMessageType.CLUE_DROP;
+		}
+		if (text.contains("has a funny feeling like")
+			|| text.contains("backpack:")
+			|| text.contains("something special:"))
+		{
+			return SystemMessageType.PET_DROP;
+		}
+		if (text.contains("received a drop:"))
+		{
+			return SystemMessageType.DROP;
+		}
+		if (text.contains("personal best:"))
+		{
+			return SystemMessageType.PERSONAL_BEST;
+		}
+		if (text.contains("has completed a quest:"))
+		{
+			return SystemMessageType.QUESTS;
+		}
+		if (text.contains("tier of rewards from combat achievements!")
+			|| (text.contains("has completed") && text.contains("combat task")))
+		{
+			return SystemMessageType.COMBAT_ACHIEVEMENTS;
+		}
+		if (text.contains("has completed the") && text.contains("diary."))
+		{
+			return SystemMessageType.DIARY;
+		}
+		if (text.contains("has reached a total level of")
+			|| (text.contains("has reached") && (text.contains(" level") || text.contains(" xp"))))
+		{
+			return SystemMessageType.LEVEL_UP;
+		}
+		if (text.contains("has defeated") || text.contains("has been defeated by"))
+		{
+			return SystemMessageType.PVP;
+		}
+		if (text.contains("has left.")
+			|| text.contains("has been invited into the clan by")
+			|| text.contains("has joined."))
+		{
+			return SystemMessageType.ATTENDANCE;
+		}
 
-	public String fingerprint(ClanMessageType type, String sender, String clan, String message, Integer world, Instant occurredAt, boolean guest)
-	{
-		long bucket = occurredAt == null ? 0L : occurredAt.getEpochSecond() / 30L;
-		return type + "|" + sender + "|" + clan + "|" + message + "|" + (world == null ? 0 : world) + "|" + bucket + "|" + guest;
+		return SystemMessageType.UNKNOWN;
 	}
 }
