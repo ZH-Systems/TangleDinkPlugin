@@ -16,6 +16,7 @@ repositories {
 def lombokVersion = '1.18.46'
 def runeLiteVersion = 'latest.' + (project.hasProperty('use.snapshot') ? 'integration' : 'release')
 def junitVersion = '5.5.2'
+def devSideloadDir = file("${System.getProperty('user.home')}/.runelite/sideloaded-plugins")
 
 dependencies {
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
@@ -63,10 +64,18 @@ tasks.register('generateResources', Test) {
 tasks.register('run', JavaExec) {
 	group = 'application'
 	description = 'Launches RuneLite with the TcCrew plugin loaded.'
+	dependsOn 'installDevPlugin'
 	classpath = sourceSets.main.runtimeClasspath
-	mainClass = 'tccrewplugin.DinkTest'
+	mainClass = 'net.runelite.client.RuneLite'
 	jvmArgs '-ea'
 	args '--developer-mode', '--debug'
+}
+
+tasks.register('installDevPlugin', Copy) {
+	dependsOn shadowJar
+	from(tasks.named('shadowJar'))
+	into devSideloadDir
+	rename { 'tangledinkplugin-dev.jar' }
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {
@@ -93,6 +102,7 @@ tasks.register('shadowJar', Jar) {
 	exclude 'META-INF/*.DSA'
 	exclude 'META-INF/*.RSA'
 	exclude '**/module-info.class'
+	exclude 'tccrewplugin/TcCrewPlugin.class'
 
 	group = BasePlugin.BUILD_GROUP
 	archiveClassifier.set('shadow')

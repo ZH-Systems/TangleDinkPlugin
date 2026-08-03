@@ -1,9 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Dink" type="Application" factoryName="Application">
+  <configuration default="false" name="Dink" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="ms-11" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="tccrewplugin.DinkTest" />
-    <module name="TangleCrewPlugin.main" />
     <option name="PROGRAM_PARAMETERS" value="--developer-mode --debug" />
     <shortenClasspath name="ARGS_FILE" />
     <option name="VM_PARAMETERS" value="-ea" />
