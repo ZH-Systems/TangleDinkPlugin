@@ -1,6 +1,9 @@
 package tccrewplugin;
 
 import com.google.inject.Provides;
+import tccrewplugin.clanchat.ClanChatWebhookManager;
+import tccrewplugin.sync.ClogPbSyncManager;
+import tccrewplugin.sync.clog.CollectionLogSyncButtonManager;
 import tccrewplugin.notifiers.ChatNotifier;
 import tccrewplugin.notifiers.ClueNotifier;
 import tccrewplugin.notifiers.CollectionNotifier;
@@ -32,12 +35,15 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.AccountHashChanged;
 import net.runelite.api.events.ActorDeath;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.client.events.ChatboxInput;
 import net.runelite.api.events.CommandExecuted;
+import net.runelite.api.events.ClanChannelChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GrandExchangeOfferChanged;
 import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.InteractingChanged;
+import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.UsernameChanged;
@@ -72,9 +78,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 @PluginDescriptor(
     name = "Tangle Crew Plugin",
-    description = "Discord-compatible webhook notifications for Loot, Death, Levels, CLog, KC, Diary, Quests, etc.",
+    description = "Discord-compatible webhook notifications for Loot, Death, Levels, CLog, KC, Diary, Quests, and clan chat.",
     tags = { "loot", "logger", "collection", "pet", "death", "xp", "level", "notifications", "discord", "speedrun",
-        "diary", "combat achievements", "combat task", "barbarian assault", "high level gambles" }
+        "diary", "combat achievements", "combat task", "barbarian assault", "high level gambles", "clan chat", "webhook" }
 )
 public class TcCrewPlugin extends Plugin {
     public static final String USER_AGENT = RuneLite.USER_AGENT + " (TcCrew/1.x)";
@@ -83,6 +89,9 @@ public class TcCrewPlugin extends Plugin {
 
     private @Inject SettingsManager settingsManager;
     private @Inject ClanEventManager clanEventManager;
+    private @Inject ClanChatWebhookManager clanChatWebhookManager;
+    private @Inject ClogPbSyncManager clogPbSyncManager;
+    private @Inject CollectionLogSyncButtonManager collectionLogSyncButtonManager;
     private @Inject RemoteEventManager remoteEventManager;
     private @Inject ClanEventOverlay clanEventOverlay;
     private @Inject OverlayManager overlayManager;
@@ -134,6 +143,9 @@ public class TcCrewPlugin extends Plugin {
         log.debug("Started up Dink");
         settingsManager.init();
         clanEventManager.init();
+        clanChatWebhookManager.startUp();
+        clogPbSyncManager.start();
+        collectionLogSyncButtonManager.startUp();
         remoteEventManager.startUp();
         overlayManager.add(clanEventOverlay);
         versionManager.onStart();
@@ -150,6 +162,9 @@ public class TcCrewPlugin extends Plugin {
         log.debug("Shutting down Dink");
         this.resetNotifiers();
         overlayManager.remove(clanEventOverlay);
+        collectionLogSyncButtonManager.shutDown();
+        clanChatWebhookManager.shutDown();
+        clogPbSyncManager.shutdown();
         remoteEventManager.shutDown();
         gameState.lazySet(null);
         accountTracker.clear();
@@ -191,13 +206,21 @@ public class TcCrewPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onChatboxInput(ChatboxInput event) {
+        clogPbSyncManager.onChatboxInput(event);
+    }
+
+    @Subscribe
     public void onConfigChanged(ConfigChanged event) {
         if (!SettingsManager.CONFIG_GROUP.equals(event.getGroup())) {
+            clogPbSyncManager.onConfigChanged(event);
             return;
         }
 
         settingsManager.onConfigChanged(event);
         clanEventManager.onConfigChanged(event.getKey());
+        clanChatWebhookManager.onConfigChanged(event.getKey());
+        clogPbSyncManager.onConfigChanged(event);
         remoteEventManager.onConfigChanged(event.getKey());
         accountTracker.onConfig(event.getKey());
         worldTracker.onConfig(event.getKey());
@@ -233,6 +256,7 @@ public class TcCrewPlugin extends Plugin {
 
         versionManager.onGameState(previousState, newState);
         settingsManager.onGameState(previousState, newState);
+        clogPbSyncManager.onGameStateChanged(gameStateChanged);
         collectionNotifier.onGameState(newState);
         levelNotifier.onGameStateChanged(gameStateChanged);
         diaryNotifier.onGameState(gameStateChanged);
@@ -267,6 +291,8 @@ public class TcCrewPlugin extends Plugin {
 
     @Subscribe(priority = 1) // run before the base loot tracker plugin
     public void onChatMessage(ChatMessage message) {
+        clogPbSyncManager.onChatMessage(message);
+        clanChatWebhookManager.onChatMessage(message);
         String chatMessage = Utils.sanitize(message.getMessage());
         String source = message.getName() != null && !message.getName().isEmpty() ? message.getName() : message.getSender();
         chatNotifier.onMessage(message.getType(), source, chatMessage);
@@ -321,6 +347,11 @@ public class TcCrewPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onClanChannelChanged(ClanChannelChanged event) {
+        clanChatWebhookManager.onClanChannelChanged(event);
+    }
+
+    @Subscribe
     public void onHitsplatApplied(HitsplatApplied event) {
         pkNotifier.onHitsplat(event);
     }
@@ -340,6 +371,11 @@ public class TcCrewPlugin extends Plugin {
         collectionNotifier.onScript(event.getScriptId());
         petNotifier.onScript(event.getScriptId());
         deathNotifier.onScript(event);
+    }
+
+    @Subscribe
+    public void onScriptPostFired(ScriptPostFired event) {
+        clogPbSyncManager.onScriptPostFired(event);
     }
 
     @Subscribe(priority = 1) // run before the base loot tracker plugin
@@ -393,6 +429,7 @@ public class TcCrewPlugin extends Plugin {
         settingsManager.onVarbitChanged(event);
         accountTracker.onVarbit(event);
         metaNotifier.onVarbit(event);
+        clogPbSyncManager.onVarbitChanged(event);
         collectionNotifier.onVarPlayer(event);
         diaryNotifier.onVarbitChanged(event);
     }
@@ -401,6 +438,7 @@ public class TcCrewPlugin extends Plugin {
     public void onWidgetLoaded(WidgetLoaded event) {
         metaNotifier.onWidget(event);
         killCountService.onWidget(event);
+        clogPbSyncManager.onWidgetLoaded(event);
         questNotifier.onWidgetLoaded(event);
         clueNotifier.onWidgetLoaded(event);
         speedrunNotifier.onWidgetLoaded(event);
@@ -411,6 +449,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Subscribe
     public void onWidgetClosed(WidgetClosed event) {
+        clogPbSyncManager.onWidgetClosed(event);
         groupStorageNotifier.onWidgetClose(event);
         tradeNotifier.onWidgetClose(event);
     }

@@ -31,190 +31,73 @@ import java.util.Set;
 public interface DinkPluginConfig extends Config {
 
     @ConfigSection(
-        name = "Clan Event",
-        description = "Temporary clan event webhook and on-screen code settings",
+        name = "Event Drop Detection",
+        description = "Temporary event drop detection webhook and on-screen code settings",
         position = -30,
         closedByDefault = false
     )
     String clanEventSection = "Clan Event";
 
-    @ConfigSection(
-        name = "Webhook Overrides",
-        description = "Allows webhook data to be sent to a different URL, for the various notifiers",
-        position = -20,
-        closedByDefault = true
-    )
-    String webhookSection = "Webhook Overrides";
+    String webhookSection = clanEventSection;
+
+    String collectionSection = clanEventSection;
+
+    String petSection = clanEventSection;
+
+    String levelSection = clanEventSection;
+
+    String lootSection = clanEventSection;
+
+    String deathSection = clanEventSection;
+
+    String slayerSection = clanEventSection;
+
+    String questSection = clanEventSection;
+
+    String clueSection = clanEventSection;
+
+    String speedrunSection = clanEventSection;
+
+    String killCountSection = clanEventSection;
+
+    String combatTaskSection = clanEventSection;
+
+    String diarySection = clanEventSection;
+
+    String gambleSection = clanEventSection;
+
+    String pkSection = clanEventSection;
+
+    String groupStorageSection = clanEventSection;
+
+    String grandExchangeSection = clanEventSection;
+
+    String tradeSection = clanEventSection;
+
+    String chatSection = clanEventSection;
 
     @ConfigSection(
-        name = "Collection Log",
-        description = "Settings for notifying about collection log",
-        position = 0,
-        closedByDefault = true
+        name = "Clan Chat Webhook",
+        description = "Clan chat webhook settings",
+        position = -29,
+        closedByDefault = false
     )
-    String collectionSection = "Collection Log";
+    String clanChatWebhookSection = "Clan Chat Webhook";
+
+    String externalSection = clanEventSection;
 
     @ConfigSection(
-        name = "Pet",
-        description = "Settings for notifying when obtaining a pet",
-        position = 10,
+        name = "Clog/PB Sync",
+        description = "Configure collection log and personal best synchronization.",
+        position = -28,
         closedByDefault = true
     )
-    String petSection = "Pet";
-
-    @ConfigSection(
-        name = "Levels",
-        description = "Settings for notifying when levelling a skill",
-        position = 20,
-        closedByDefault = true
-    )
-    String levelSection = "Levels";
-
-    @ConfigSection(
-        name = "Loot",
-        description = "Settings for notifying when loot is dropped",
-        position = 30,
-        closedByDefault = true
-    )
-    String lootSection = "Loot";
-
-    @ConfigSection(
-        name = "Death",
-        description = "Settings for notifying when you die",
-        position = 40,
-        closedByDefault = true
-    )
-    String deathSection = "Death";
-
-    @ConfigSection(
-        name = "Slayer",
-        description = "Settings for notifying when you complete a slayer task",
-        position = 50,
-        closedByDefault = true
-    )
-    String slayerSection = "Slayer";
-
-    @ConfigSection(
-        name = "Quests",
-        description = "Settings for notifying when you complete a quest",
-        position = 60,
-        closedByDefault = true
-    )
-    String questSection = "Quests";
-
-    @ConfigSection(
-        name = "Clue Scrolls",
-        description = "Settings for notifying when you complete a clue scroll",
-        position = 70,
-        closedByDefault = true
-    )
-    String clueSection = "Clue Scrolls";
-
-    @ConfigSection(
-        name = "Speedruns",
-        description = "Settings for notifying when you finish a speedrun",
-        position = 80,
-        closedByDefault = true
-    )
-    String speedrunSection = "Speedruns";
-
-    @ConfigSection(
-        name = "Kill Count",
-        description = "Settings for notifying when you kill a boss",
-        position = 90,
-        closedByDefault = true
-    )
-    String killCountSection = "Kill Count";
-
-    @ConfigSection(
-        name = "Combat Tasks",
-        description = "Settings for notifying when you complete a combat achievement",
-        position = 100,
-        closedByDefault = true
-    )
-    String combatTaskSection = "Combat Tasks";
-
-    @ConfigSection(
-        name = "Achievement Diary",
-        description = "Settings for notifying when you complete an Achievement Diary",
-        position = 110,
-        closedByDefault = true
-    )
-    String diarySection = "Achievement Diary";
-
-    @ConfigSection(
-        name = "BA Gambles",
-        description = "Settings for notifying when you gamble at Barbarian Assault",
-        position = 120,
-        closedByDefault = true
-    )
-    String gambleSection = "BA Gambles";
-
-    @ConfigSection(
-        name = "Player Kills",
-        description = "Settings for notifying when you kill another player",
-        position = 130,
-        closedByDefault = true
-    )
-    String pkSection = "Player Kills";
-
-    @ConfigSection(
-        name = "Group Storage",
-        description = "Settings for notifying when you deposit or withdraw items from group ironman shared storage",
-        position = 140,
-        closedByDefault = true
-    )
-    String groupStorageSection = "Group Storage";
-
-    @ConfigSection(
-        name = "Grand Exchange",
-        description = "Settings for notifying when you buy or sell items from the Grand Exchange",
-        position = 150,
-        closedByDefault = true
-    )
-    String grandExchangeSection = "Grand Exchange";
-
-    @ConfigSection(
-        name = "Player Trades",
-        description = "Settings for notifying when you trade with another player",
-        position = 160,
-        closedByDefault = true
-    )
-    String tradeSection = "Player Trades";
-
-    @ConfigSection(
-        name = "Custom Chat Messages",
-        description = "Settings for notifying when you receive specific messages from the game",
-        position = 170,
-        closedByDefault = true
-    )
-    String chatSection = "Custom Chat Messages";
-
-    @ConfigSection(
-        name = "External Plugin Requests",
-        description = "Settings for notifying when other plugins request Dink notifications to be fired",
-        position = 180,
-        closedByDefault = true
-    )
-    String externalSection = "External Plugin Requests";
+    String clogPbSyncSection = "clogPbSync";
 
 
-    @ConfigSection(
-        name = "Leagues",
-        description = "Settings for notifying when you complete league tasks, unlock areas, and redeem relics",
-        position = 200,
-        closedByDefault = true
-    )
+    String leaguesSection = clanEventSection;
 
-    String leaguesSection = "Leagues";
-
-    @ConfigSection(
-        name = "Advanced",
-        description = "Do not modify without fully understanding these settings",
-        position = 1000,
-        closedByDefault = true
-    )
-    String advancedSection = "Advanced";
+    String advancedSection = clanEventSection;
 
     @ConfigItem(
         keyName = VersionManager.VERSION_CONFIG_KEY,
@@ -224,6 +107,273 @@ public interface DinkPluginConfig extends Config {
     )
     default String pluginVersion() {
         return "";
+    }
+
+    @ConfigItem(
+        keyName = "secret",
+        name = "Secret Key",
+        description = "The secret key used to authenticate webhook requests.",
+        position = 0,
+        section = clanChatWebhookSection
+    )
+    default String secretKey()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "webhook_endpoint",
+        name = "Endpoint URL",
+        description = "The server endpoint where clan chat events are sent.",
+        position = 1,
+        section = clanChatWebhookSection
+    )
+    default String webhookEndpoint()
+    {
+        return "https://clanchat.net";
+    }
+
+    @ConfigItem(
+        keyName = "clan_name",
+        name = "Clan Name",
+        description = "Optional clan name filter. Messages from other clans will not be sent.",
+        position = 2,
+        section = clanChatWebhookSection
+    )
+    default String clanName()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "sendNormalChat",
+        name = "Send Normal Clan Chat",
+        description = "Controls whether player-written clan messages are transmitted.",
+        position = 3,
+        section = clanChatWebhookSection
+    )
+    default boolean sendNormalChat()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "sendSystemBroadcasts",
+        name = "Send System Broadcasts",
+        description = "Controls whether clan system broadcasts are transmitted.",
+        position = 4,
+        section = clanChatWebhookSection
+    )
+    default boolean sendSystemBroadcasts()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "sendUnknownBroadcasts",
+        name = "Send Unknown Broadcasts",
+        description = "Unknown system broadcasts are retained because RuneScape message formats can change.",
+        position = 5,
+        section = clanChatWebhookSection
+    )
+    default boolean sendUnknownBroadcasts()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "sendLoginGuidance",
+        name = "Send Login Guidance",
+        description = "Controls whether instructional clan login guidance messages are transmitted.",
+        position = 6,
+        section = clanChatWebhookSection
+    )
+    default boolean sendLoginGuidance()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "debugLogging",
+        name = "Debug Logging",
+        description = "When enabled, log safe diagnostic information.",
+        position = 7,
+        section = clanChatWebhookSection
+    )
+    default boolean debugLogging()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "requestTimeoutSeconds",
+        name = "Request Timeout",
+        description = "The timeout used for clan webhook HTTP requests.",
+        position = 8,
+        section = clanChatWebhookSection
+    )
+    @Units(Units.SECONDS)
+    default int requestTimeoutSeconds()
+    {
+        return 10;
+    }
+
+    @ConfigItem(
+        keyName = "includeClientMetadata",
+        name = "Include Client Metadata",
+        description = "Allows the payload to include plugin and RuneLite metadata.",
+        position = 9,
+        section = clanChatWebhookSection
+    )
+    default boolean includeClientMetadata()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbSyncEnabled",
+        name = "Enable synchronization",
+        description = "Allows collection log and personal best data to be uploaded to the configured webhook.",
+        position = 10,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbSyncEnabled()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbWebhookUrl",
+        name = "Webhook URL",
+        description = "HTTPS endpoint that receives collection log and personal best JSON payloads.",
+        position = 11,
+        section = clogPbSyncSection
+    )
+    default String clogPbWebhookUrl()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "clogPbWebhookToken",
+        name = "Webhook token",
+        description = "Bearer token used to authenticate receiver webhook requests. Leave blank for direct Discord webhooks.",
+        position = 12,
+        section = clogPbSyncSection,
+        secret = true
+    )
+    default String clogPbWebhookToken()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "clogPbSigningSecret",
+        name = "Signing secret",
+        description = "Secret used to sign webhook requests using HMAC-SHA256.",
+        position = 13,
+        section = clogPbSyncSection,
+        secret = true
+    )
+    default String clogPbSigningSecret()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "clogSyncEnabled",
+        name = "Enable collection log sync",
+        description = "Allows collection log snapshots to be uploaded.",
+        position = 14,
+        section = clogPbSyncSection
+    )
+    default boolean clogSyncEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "pbSyncEnabled",
+        name = "Enable PB sync",
+        description = "Allows locally known personal bests to be uploaded.",
+        position = 15,
+        section = clogPbSyncSection
+    )
+    default boolean pbSyncEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbShowQueuedMessages",
+        name = "Show queued messages",
+        description = "Shows a local chat message when an upload is queued.",
+        position = 16,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbShowQueuedMessages()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbShowSuccessMessages",
+        name = "Show success messages",
+        description = "Shows a local chat message after a successful upload.",
+        position = 17,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbShowSuccessMessages()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbShowErrorMessages",
+        name = "Show error messages",
+        description = "Shows a local chat message when synchronization fails.",
+        position = 18,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbShowErrorMessages()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbAutoUploadCollectionLog",
+        name = "Auto-upload collection log",
+        description = "Uploads collection log changes after relevant game-state events.",
+        position = 19,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbAutoUploadCollectionLog()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbAutoUploadPersonalBests",
+        name = "Auto-upload PB improvements",
+        description = "Uploads newly detected personal best improvements after relevant state changes.",
+        position = 20,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbAutoUploadPersonalBests()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "clogPbDebugLogging",
+        name = "Debug logging",
+        description = "Writes non-sensitive synchronization diagnostics to the plugin log.",
+        position = 21,
+        section = clogPbSyncSection
+    )
+    default boolean clogPbDebugLogging()
+    {
+        return false;
     }
 
     @ConfigItem(
@@ -753,7 +903,8 @@ public interface DinkPluginConfig extends Config {
         name = "Primary Webhook URLs",
         description = "The default webhook URL to send notifications to, if no override is specified.<br/>" +
             "You can target multiple webhooks by specifying their URLs on separate lines",
-        position = -20
+        position = -20,
+        section = clanEventSection
     )
     default String primaryWebhook() {
         return "";

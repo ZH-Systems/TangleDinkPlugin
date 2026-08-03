@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
+import tccrewplugin.domain.RemoteEventConfig;
+import tccrewplugin.domain.RemoteEventMigration;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

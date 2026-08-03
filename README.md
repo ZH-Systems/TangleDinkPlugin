@@ -25,6 +25,244 @@ Examples of the metadata payloads sent by the plugin are available in [docs/json
 
 If you find a bug or want a new notifier added, open an issue in this repository.
 
+## Clan Chat Webhooks
+
+The plugin now includes a client-side clan chat webhook sender.
+
+It listens to RuneLite clan chat events, sanitizes RuneLite markup, classifies clan system messages, detects account type badges, and sends a structured multipart request to your webhook endpoint.
+
+### Configuration
+
+These settings live in the `Clan Chat Webhook` config section:
+
+- `Secret Key`
+- `Endpoint URL`
+- `Clan Name`
+- `Send Normal Clan Chat`
+- `Send System Broadcasts`
+- `Send Unknown Broadcasts`
+- `Send Login Guidance`
+- `Debug Logging`
+- `Request Timeout`
+- `Include Client Metadata`
+
+The endpoint should normally be the base server URL, for example:
+
+`https://example.com`
+
+The plugin appends:
+
+`/webhook/{secretKey}`
+
+### Request Format
+
+The plugin sends:
+
+`POST {endpoint}/webhook/{secretKey}`
+
+with `multipart/form-data` containing one field:
+
+- `data` - JSON-serialized clan message payload
+
+### Payload Example
+
+```json
+{
+  "author": "Example Player",
+  "content": "Example Player received a new collection log item: Dragon defender",
+  "accountType": "IRON",
+  "systemMessageType": "COLLECTION_LOG",
+  "timestamp": 1775160000,
+  "clanTitle": null
+}
+```
+
+### Message Coverage
+
+The webhook sender supports:
+
+- normal clan chat
+- clan system messages
+- drops
+- raid drops
+- pet drops
+- collection-log entries
+- personal bests
+- quests
+- PvP broadcasts
+- membership events
+- level-ups
+- combat achievements
+- clue drops
+- achievement diaries
+- unknown clan broadcasts
+
+### Troubleshooting
+
+- Make sure the secret key is set
+- Make sure the endpoint URL is valid
+- Prefer `https`
+- If you are testing locally, `http://localhost` is allowed
+- Check `Debug Logging` for safe diagnostics
+- If a clan name filter is set, it must match the active clan exactly after whitespace normalization
+
+### Security Notes
+
+- The secret is never logged
+- HTTP requests are asynchronous
+- Requests have a timeout
+- Retry handling is bounded
+- Duplicate clan messages are suppressed for a short window
+- The plugin does not send messages when the endpoint is malformed
+
+### Local Testing
+
+1. Start a local webhook receiver.
+2. Set `Endpoint URL` to `http://localhost:<port>` or your HTTPS server base URL.
+3. Set `Secret Key` to the token your receiver expects.
+4. Enable the clan chat options you want to test.
+5. Log into RuneLite and send a clan message or trigger a clan broadcast.
+
+## Clog/PB Sync
+
+The plugin also includes a client-side collection-log and personal-best sync path.
+
+It reads locally available collection-log state, reads the same personal-best values RuneLite stores for `!pb`, and sends versioned JSON to a webhook you configure.
+
+### Configuration
+
+These settings live in the `Clog/PB Sync` config section:
+
+- `Enable synchronization`
+- `Webhook URL`
+- `Webhook token`
+- `Signing secret`
+- `Enable collection log sync`
+- `Enable PB sync`
+- `Show queued messages`
+- `Show success messages`
+- `Show error messages`
+- `Auto-upload collection log`
+- `Auto-upload PB improvements`
+- `Debug logging`
+
+Both automatic upload toggles are off by default.
+
+### Commands
+
+- `!clogsync` uploads the cached collection log snapshot
+- `!clogstatus` prints the current sync/cache state locally
+- `!pball` uploads all locally known personal bests
+- `!syncall` uploads a combined collection-log and PB snapshot
+
+The native RuneLite `!pb <boss>` command remains unchanged.
+
+### Webhook Contract
+
+The sync endpoint must be HTTPS and should point at your webhook receiver base URL.
+
+If you want to send directly to Discord, set `Webhook URL` to the Discord webhook URL itself and leave `Webhook token` blank.
+
+The exact request and payload schema are documented in [docs/clog-pb-webhook.md](docs/clog-pb-webhook.md).
+
+The plugin sends JSON with:
+
+- `Authorization: Bearer <token>`
+- `User-Agent`
+- `X-Event-Id`
+- `X-Event-Type`
+- `X-Captured-At`
+- `X-Timestamp`
+- `X-Nonce`
+- `X-Content-SHA256`
+- optional `X-Signature` when a signing secret is configured
+
+### Payload Example
+
+```json
+{
+  "schemaVersion": 1,
+  "eventType": "personal_bests.snapshot",
+  "eventId": "40f83204-ef2e-4ed3-83fc-2427001aa2e1",
+  "capturedAt": "2026-08-03T03:15:00Z",
+  "command": "!pball",
+  "player": {
+    "displayName": "Example Player",
+    "accountType": "STANDARD"
+  },
+  "client": {
+    "runeliteVersion": "current-version",
+    "pluginVersion": "current-plugin-version"
+  },
+  "summary": {
+    "known": 18,
+    "notLoaded": 7,
+    "malformed": 0,
+    "unsupported": 0
+  },
+  "personalBests": [
+    {
+      "activityKey": "zulrah",
+      "activityName": "Zulrah",
+      "variant": null,
+      "teamSize": null,
+      "durationMilliseconds": 58200,
+      "source": "runelite-local-config"
+    }
+  ]
+}
+```
+
+### Troubleshooting
+
+- Make sure `Enable synchronization` is on.
+- Make sure the webhook URL is valid and HTTPS.
+- If you are using a receiver, make sure the webhook token is set.
+- If you are using Discord directly, leave the webhook token blank and use the Discord webhook URL.
+- Use `!clogstatus` to see whether RuneLite has a cached snapshot yet.
+- If auto upload is enabled, the plugin still waits for relevant game-state changes instead of polling.
+
+### Security Notes
+
+- Secrets are not logged.
+- Requests are asynchronous.
+- Requests are bounded and retried only a small number of times.
+- The plugin does not poll for collection-log or PB state.
+- The plugin does not send any RuneLite state other than the sync payload.
+
+### How to Test
+
+Use these commands inside RuneLite:
+
+- `!clogsync`
+  - Uploads the cached collection log snapshot
+- `!clogstatus`
+  - Shows the current cache and capture state locally
+- `!pball`
+  - Uploads all locally known personal bests from RuneLite's `personalbest` profile data
+- `!syncall`
+  - Uploads both collection-log and PB data in one payload
+
+Suggested test flow:
+
+1. Open RuneLite and confirm the plugin is enabled.
+2. Set `Enable synchronization` on.
+3. Set `Webhook URL`, `Webhook token`, and, if needed, `Signing secret`.
+4. Use `!clogstatus` first to confirm the plugin sees the current state.
+5. Run `!pball` and confirm the webhook receives a JSON payload with `eventType = personal_bests.snapshot`.
+6. Open the Collection Log in-game, then run `!clogsync` and confirm the webhook receives `eventType = collection_log.snapshot`.
+7. Run `!syncall` and confirm the webhook receives `eventType = player_data.snapshot`.
+8. If you want automatic uploads, turn on the `Auto-upload collection log` and `Auto-upload PB improvements` toggles, then trigger a relevant in-game state change.
+
+What to verify:
+
+- `!pb <boss>` still works normally through RuneLite
+- `!clogstatus` reports the sync cache state without sending a request
+- `!clogsync` sends only collection-log data
+- `!pball` sends only local PB data
+- `!syncall` sends both sections together
+- the plugin does not upload anything when synchronization is disabled
+
 ## What It Does
 
 The plugin currently covers:
@@ -69,22 +307,15 @@ To use the plugin, you need at least one webhook URL.
 
 If you want certain notifier types to use different destinations, place URLs in the relevant `Webhook Overrides` fields instead of only using the primary URL.
 
-## Clan Event Workflow
+## Event Drop Detection Workflow
 
-The plugin has a dedicated `Clan Event` settings section.
+The plugin now uses one `Event Drop Detection` settings section for the full config.
 
-While a clan event is active, the clan-event webhook overrides all other webhook URLs.
-The same section also stores:
-
-- `Clan Event Enabled`
-- `Clan Event Webhook URLs`
-- `Clan Event End Time`
-- `Clan Event Secret Code`
-- Remote event polling settings
+That section contains the webhook URLs, event state, remote event polling, notifier toggles, and all related notifier options. While a clan event is active, the clan-event webhook overrides all other webhook URLs.
 
 The overlay can display the current clan-event state on screen.
 
-### Remote Clan Event Commands
+### Remote Event Commands
 
 The remote-event workflow uses the `DinkEvent` chat command family.
 
@@ -113,13 +344,6 @@ If the plugin settings panel was already open, close and reopen it after applyin
 
 ### Remote Event Settings
 
-The clan-event settings section includes:
-
-- `Remote Event Config URL`
-- `Poll Remote Events`
-- `Remote Poll Interval`
-- `Allowed Migration Hosts`
-
 The default remote event config URL points at the repository-hosted JSON used to announce active clan events.
 
 ## Chat Commands
@@ -137,10 +361,7 @@ Export your current configuration to the clipboard.
 - `::DinkExport webhooks`
   - Exports only webhook-related settings
 - `::DinkExport <section>`
-  - Exports one or more section groups, for example:
-    - `::DinkExport pet`
-    - `::DinkExport collectionlog`
-    - `::DinkExport slayer bagambles`
+  - Exports the named config section, which is now `eventdropdetection`
 
 ### `::DinkImport`
 
