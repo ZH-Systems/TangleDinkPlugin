@@ -44,10 +44,8 @@ public class ClanChatService
 	private final TangleDinkConfig config;
 	private final Gson gson;
 	private final ScheduledExecutorService executor;
-	private final ClanMessageClassifier classifier = new ClanMessageClassifier();
 	private final ClanMessageFilter filter = new ClanMessageFilter();
 	private volatile ClanMessageQueue queue;
-	private final ClanMessageSanitizer sanitizer = new ClanMessageSanitizer();
 	private final ClanWebhookDispatcher dispatcher;
 	private final ClanMemberResolver clanMemberResolver = new ClanMemberResolver();
 	private final AtomicBoolean shutdown = new AtomicBoolean();
@@ -124,7 +122,7 @@ public class ClanChatService
 			return;
 		}
 
-		ClanMessageRecord record = classifier.classify(
+		ClanMessageRecord record = ClanMessageClassifier.classify(
 			chatTypeName,
 			sender,
 			senderRank,
@@ -167,7 +165,7 @@ public class ClanChatService
 			lastError = "clan webhooks disabled";
 			return;
 		}
-		ClanMessageRecord record = classifier.classify("TEST", "Tangle Dink", null, currentClanName.get(), "Webhook test message", client.getWorld(), false, Instant.now(), true);
+		ClanMessageRecord record = ClanMessageClassifier.classify("TEST", "Tangle Dink", null, currentClanName.get(), "Webhook test message", client.getWorld(), false, Instant.now(), true);
 		if (!queue.offer(record))
 		{
 			lastError = "webhook queue full";
@@ -369,7 +367,7 @@ public class ClanChatService
 			record.getType().name(),
 			config.includeSenderRank() ? record.getSender() : null,
 			config.includeSenderRank() ? record.getSenderRank() : null,
-			sanitizer.sanitize(record.getText(), config.redactUrls()),
+			ClanMessageSanitizer.sanitize(record.getText(), config.redactUrls()),
 			record.isGuest()
 		);
 		return new ClanWebhookPayload(

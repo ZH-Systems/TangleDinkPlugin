@@ -1,6 +1,9 @@
 package tccrewplugin.clanchat;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import org.junit.jupiter.api.Test;
 import tccrewplugin.clanchat.model.ClanMessageRecord;
 import tccrewplugin.clanchat.model.ClanWebhookPayload;
@@ -38,13 +41,16 @@ public class ClanQueueAndPayloadTest
 			new ClanWebhookPayload.Message("CHAT", "Sender", "GENERAL", "Hello", false),
 			true
 		);
-		String json = new Gson().toJson(payload);
+		String json = new GsonBuilder()
+			.registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
+			.create()
+			.toJson(payload);
 		assertTrue(json.contains("\"eventType\":\"TEST\""));
 		assertFalse(payload.toString().contains("secret"));
 	}
 
 	private ClanMessageRecord record(String text)
 	{
-		return new ClanMessageClassifier().classify("CLAN_CHAT", "Bob", "General", "Clan", text, 301, false, Instant.now(), false);
+		return ClanMessageClassifier.classify("CLAN_CHAT", "Bob", "General", "Clan", text, 301, false, Instant.now(), false);
 	}
 }
