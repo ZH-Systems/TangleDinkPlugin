@@ -94,6 +94,14 @@ public interface DinkPluginConfig extends Config {
     )
     String clogPbSyncSection = "clogPbSync";
 
+    @ConfigSection(
+        name = "LFG Settings",
+        description = "Configure Looking For Group synchronization, categories, Discord routing, and sidebar behaviour.",
+        position = -27,
+        closedByDefault = false
+    )
+    String lfgSection = "lfg";
+
 
     String leaguesSection = clanEventSection;
 
@@ -372,6 +380,143 @@ public interface DinkPluginConfig extends Config {
         section = clogPbSyncSection
     )
     default boolean clogPbDebugLogging()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+        keyName = "lfgEnabled",
+        name = "Enable Looking For Group",
+        description = "Enables the Tangle Crew Looking For Group sidebar and synchronization.",
+        position = 0,
+        section = lfgSection
+    )
+    default boolean lfgEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "lfgSupabaseUrl",
+        name = "Supabase URL",
+        description = "Base URL for the Supabase project hosting the Looking For Group backend.",
+        position = 1,
+        section = lfgSection
+    )
+    default String lfgSupabaseUrl()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "lfgApiToken",
+        name = "LFG API Token",
+        description = "Restricted token used to authenticate Looking For Group requests.",
+        position = 2,
+        section = lfgSection,
+        secret = true
+    )
+    default String lfgApiToken()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "lfgMasterChannelWebhook",
+        name = "Master Channel Webhook",
+        description = "Discord webhook used for the master Looking For Group channel.",
+        position = 3,
+        section = lfgSection,
+        secret = true,
+        warning = "Anyone with this URL can post to the configured Discord channel."
+    )
+    default String lfgMasterChannelWebhook()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "lfgVisibleCategories",
+        name = "Visible Categories",
+        description = "Comma-separated category keys shown in the RuneLite sidebar. Leave blank to show all enabled categories.",
+        position = 4,
+        section = lfgSection
+    )
+    default String lfgVisibleCategories()
+    {
+        return "";
+    }
+
+    @ConfigItem(
+        keyName = "lfgRefreshIntervalSeconds",
+        name = "Refresh Interval",
+        description = "How often active groups are refreshed while the LFG sidebar is open.",
+        position = 5,
+        section = lfgSection
+    )
+    @Range(min = 10, max = 300)
+    @Units(Units.SECONDS)
+    default int lfgRefreshIntervalSeconds()
+    {
+        return 20;
+    }
+
+    @ConfigItem(
+        keyName = "lfgShowChatMessages",
+        name = "Show Chat Messages",
+        description = "Shows local RuneLite chat messages for LFG actions, synchronization results, and errors.",
+        position = 6,
+        section = lfgSection
+    )
+    default boolean lfgShowChatMessages()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "lfgShowFullGroups",
+        name = "Show Full Groups",
+        description = "Shows full groups in the active group list.",
+        position = 7,
+        section = lfgSection
+    )
+    default boolean lfgShowFullGroups()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "lfgShowDiscordGroups",
+        name = "Show Discord Groups",
+        description = "Shows groups created from Discord in the RuneLite sidebar.",
+        position = 8,
+        section = lfgSection
+    )
+    default boolean lfgShowDiscordGroups()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "lfgShowRuneLiteGroups",
+        name = "Show RuneLite Groups",
+        description = "Shows groups created from RuneLite in the sidebar.",
+        position = 9,
+        section = lfgSection
+    )
+    default boolean lfgShowRuneLiteGroups()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        keyName = "lfgDebugLogging",
+        name = "Debug Logging",
+        description = "Writes non-sensitive Looking For Group diagnostics to the plugin log.",
+        position = 10,
+        section = lfgSection
+    )
+    default boolean lfgDebugLogging()
     {
         return false;
     }

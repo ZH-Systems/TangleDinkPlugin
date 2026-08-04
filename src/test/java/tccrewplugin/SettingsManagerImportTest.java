@@ -11,15 +11,20 @@ import net.runelite.client.config.ConfigManager;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tccrewplugin.domain.ConfigImportPolicy;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +54,11 @@ class SettingsManagerImportTest {
                 descriptor("clanEventWebhook"),
                 descriptor("clanEventEndTime"),
                 descriptor("clanEventSecretCode"),
+                descriptor("lfgEnabled"),
+                descriptor("lfgSupabaseUrl"),
+                descriptor("lfgApiToken", true),
+                descriptor("lfgMasterChannelWebhook", true),
+                descriptor("lfgVisibleCategories"),
                 descriptor("ignoredNames")
             )
         );
@@ -117,13 +127,74 @@ class SettingsManagerImportTest {
         verify(configManager).setConfiguration(SettingsManager.CONFIG_GROUP, "ignoredNames", "alice\nbob");
     }
 
+    @Test
+    void importedLfgApiTokenDoesNotOverwriteWithoutPolicy() {
+        when(configManager.getConfiguration(eq(SettingsManager.CONFIG_GROUP), eq("lfgApiToken"), eq(String.class))).thenReturn("old-token");
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("lfgApiToken", "new-token");
+
+        settingsManager.applyImportedConfig(map, true);
+
+        verify(configManager, never()).setConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken", "new-token");
+    }
+
+    @Test
+    void importedLfgApiTokenOverwritesWithWebhookPolicy() {
+        when(config.importPolicy()).thenReturn(EnumSet.of(ConfigImportPolicy.OVERWRITE_WEBHOOKS));
+        when(configManager.getConfiguration(eq(SettingsManager.CONFIG_GROUP), eq("lfgApiToken"), eq(String.class))).thenReturn("old-token");
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("lfgApiToken", "new-token");
+
+        settingsManager.applyImportedConfig(map, true);
+
+        verify(configManager).setConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken", "new-token");
+    }
+
+    @Test
+    void exportOmitsLfgSecretsByDefault() {
+        when(configManager.getConfigurationKeys(SettingsManager.CONFIG_GROUP + ".")).thenReturn(List.of(
+            SettingsManager.CONFIG_GROUP + ".lfgEnabled",
+            SettingsManager.CONFIG_GROUP + ".lfgSupabaseUrl",
+            SettingsManager.CONFIG_GROUP + ".lfgApiToken",
+            SettingsManager.CONFIG_GROUP + ".lfgMasterChannelWebhook",
+            SettingsManager.CONFIG_GROUP + ".lfgVisibleCategories"
+        ));
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgEnabled")).thenReturn("true");
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgSupabaseUrl")).thenReturn("https://supabase.example");
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken")).thenReturn("secret-token");
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgMasterChannelWebhook")).thenReturn("https://discord.example/webhook");
+        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgVisibleCategories")).thenReturn("raid,boss");
+
+        Map<String, Object> exported = settingsManager.buildExportConfigMap(key -> !Set.of("lfgApiToken", "lfgMasterChannelWebhook").contains(key));
+
+        verify(configManager).getConfigurationKeys(SettingsManager.CONFIG_GROUP + ".");
+        verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgEnabled");
+        verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgSupabaseUrl");
+        verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgVisibleCategories");
+        verify(configManager, never()).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken");
+        verify(configManager, never()).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgMasterChannelWebhook");
+        // The caller-side export filter excludes the secret fields; the helper still returns the non-secret LFG values.
+        assertEquals("true", exported.get("lfgEnabled"));
+        assertEquals("https://supabase.example", exported.get("lfgSupabaseUrl"));
+        assertEquals("raid,boss", exported.get("lfgVisibleCategories"));
+        assertFalse(exported.containsKey("lfgApiToken"));
+        assertFalse(exported.containsKey("lfgMasterChannelWebhook"));
+    }
+
     private static ConfigItemDescriptor descriptor(String methodName) {
+        return descriptor(methodName, false);
+    }
+
+    private static ConfigItemDescriptor descriptor(String methodName, boolean secret) {
         ConfigItem item = mock(ConfigItem.class);
         when(item.keyName()).thenReturn(methodName);
         when(item.hidden()).thenReturn(false);
-        when(item.section()).thenReturn("");
+        when(item.section()).thenReturn("lfg".equals(methodName) || methodName.startsWith("lfg") ? "lfg" : "");
+        when(item.secret()).thenReturn(secret);
 
-        Class<?> type = "clanEventEnabled".equals(methodName) ? boolean.class : String.class;
+        Class<?> type = ("clanEventEnabled".equals(methodName) || "lfgEnabled".equals(methodName)) ? boolean.class : String.class;
         return new ConfigItemDescriptor(item, type, null, null, null);
     }
 }

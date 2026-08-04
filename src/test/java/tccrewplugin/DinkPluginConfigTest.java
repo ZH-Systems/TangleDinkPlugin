@@ -24,4 +24,18 @@ class DinkPluginConfigTest
         assertTrue(item != null);
         assertEquals("clogPbSync", item.section());
     }
+
+    @Test
+    void lfgSectionExistsAndUsesSeparateFolder()
+            throws Exception
+    {
+        ConfigSection section = DinkPluginConfig.class.getDeclaredField("lfgSection").getAnnotation(ConfigSection.class);
+        assertTrue(section != null);
+        assertEquals("LFG Settings", section.name());
+
+        Method enabled = DinkPluginConfig.class.getMethod("lfgEnabled");
+        ConfigItem item = enabled.getAnnotation(ConfigItem.class);
+        assertTrue(item != null);
+        assertEquals("lfg", item.section());
+    }
 }

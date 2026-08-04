@@ -88,6 +88,11 @@ public class SettingsManager {
     private final Collection<String> hiddenConfigKeys = new HashSet<>();
 
     /**
+     * The key names of config items that contain secrets.
+     */
+    private final Collection<String> secretConfigKeys = new HashSet<>();
+
+    /**
      * Set of our config keys that correspond to webhook URL lists.
      * <p>
      * These are used for export filtering and summary checks.
@@ -167,6 +172,9 @@ public class SettingsManager {
             if (item.getItem().hidden()) {
                 hiddenConfigKeys.add(key);
             }
+            if (item.getItem().secret()) {
+                secretConfigKeys.add(key);
+            }
 
             String section = item.getItem().section();
             if (StringUtils.isNotEmpty(section)) {
@@ -184,11 +192,13 @@ public class SettingsManager {
             .addAll(knownConfigKeys.stream()
                 .filter(key -> key.endsWith("Webhook"))
                 .collect(Collectors.toSet()))
+            .addAll(secretConfigKeys)
             .build();
         exactOverwriteConfigKeys = knownConfigKeys
             .stream()
             .filter(key -> key.endsWith("Webhook")
                 || "clogPbWebhookUrl".equals(key)
+                || secretConfigKeys.contains(key)
                 || "clanEventEnabled".equals(key)
                 || "clanEventEndTime".equals(key)
                 || "clanEventSecretCode".equals(key))
@@ -392,6 +402,8 @@ public class SettingsManager {
             config.notifyGrandExchange() || config.notifyGroupStorage() || config.notifyKillCount() ||
             config.notifyLeagues() || config.notifyLevel() || config.notifyLoot() || config.notifyPet() ||
             config.notifyPk() || config.notifyQuest() || config.notifySlayer() || config.notifySpeedrun() ||
+            config.lfgEnabled() || !config.lfgSupabaseUrl().isEmpty() || !config.lfgApiToken().isEmpty() ||
+            !config.lfgMasterChannelWebhook().isEmpty() || !config.lfgVisibleCategories().isEmpty() ||
             config.notifyTrades();
     }
 
@@ -521,10 +533,22 @@ public class SettingsManager {
      */
     @Synchronized
     private void exportConfig(@NotNull Predicate<String> exportKey) {
+        Map<String, Object> configMap = buildExportConfigMap(exportKey);
+
+        Utils.copyToClipboard(gson.toJson(configMap))
+            .thenRun(() -> plugin.addChatSuccess("Copied current configuration to clipboard"))
+            .exceptionally(e -> {
+                plugin.addChatWarning("Failed to copy config to clipboard");
+                return null;
+            });
+    }
+
+    @Synchronized
+    Map<String, Object> buildExportConfigMap(@NotNull Predicate<String> exportKey) {
         loadConfigMetadata();
 
         String prefix = CONFIG_GROUP + '.';
-        Map<String, Object> configMap = configManager.getConfigurationKeys(prefix)
+        return configManager.getConfigurationKeys(prefix)
             .stream()
             .map(prop -> prop.substring(prefix.length()))
             .filter(key -> !hiddenConfigKeys.contains(key))
@@ -543,13 +567,6 @@ public class SettingsManager {
                 return true;
             })
             .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-
-        Utils.copyToClipboard(gson.toJson(configMap))
-            .thenRun(() -> plugin.addChatSuccess("Copied current configuration to clipboard"))
-            .exceptionally(e -> {
-                plugin.addChatWarning("Failed to copy config to clipboard");
-                return null;
-            });
     }
 
     /**
@@ -602,6 +619,11 @@ public class SettingsManager {
 
             if (hiddenConfigKeys.contains(key)) {
                 log.debug("Skipping importing hidden config item: {} = {}", key, rawValue);
+                return;
+            }
+
+            if (secretConfigKeys.contains(key) && !policies.contains(ConfigImportPolicy.OVERWRITE_WEBHOOKS)) {
+                log.debug("Skipping importing secret config item without overwrite policy: {}", key);
                 return;
             }
 

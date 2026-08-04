@@ -1,11 +1,23 @@
 # Tangle Dink Plugin 
 
-Tangle Dink Plugin combines two workflows in one RuneLite sidebar entry:
+Tangle Dink Plugin combines three workflows in one RuneLite sidebar entry:
 
 1. Player-data synchronization against a remote API
 2. Clan chat webhook forwarding to a configurable endpoint
+3. Looking For Group synchronization against a Supabase backend
 
 It also includes a modular sidebar with collapsible feature folders so the plugin can grow without turning the main panel into a hard-coded list of special cases.
+
+## Configuration Layout
+
+The active plugin exposes exactly four intended top-level config folders:
+
+- `Event Drop Detection`
+- `Clan Chat Webhook`
+- `Clog/PB Sync`
+- `LFG Settings`
+
+Existing settings stay in their current section. The new LFG settings live only under `LFG Settings`.
 
 ## Architecture
 
@@ -258,6 +270,93 @@ What to verify:
 - `!pb <boss>` still works normally through RuneLite
 - `!clogstatus` reports the sync cache state without sending a request
 - `!clogsync` sends only collection-log data
+
+## Looking For Group
+
+The plugin includes a RuneLite sidebar panel for Looking For Group coordination backed by Supabase.
+
+The sidebar lets you:
+
+- view active groups
+- refresh active groups
+- filter categories client-side
+- create a group
+- join a group
+- leave a group
+- close a group you can close
+- see members, status, capacity, source, creator, activity, description, and start time
+
+### Configuration
+
+These settings live in the `LFG Settings` config section:
+
+- `Enable Looking For Group`
+- `Supabase URL`
+- `LFG API Token`
+- `Master Channel Webhook`
+- `Visible Categories`
+- `Refresh Interval`
+- `Show Chat Messages`
+- `Show Full Groups`
+- `Show Discord Groups`
+- `Show RuneLite Groups`
+- `Debug Logging`
+
+`LFG API Token` and `Master Channel Webhook` are secrets and are excluded from normal config export.
+
+### API Contract
+
+The client calls these Supabase function endpoints:
+
+- `GET /functions/v1/lfg-config`
+- `GET /functions/v1/lfg-groups`
+- `POST /functions/v1/lfg-groups`
+- `POST /functions/v1/lfg-group-action`
+
+Requests include:
+
+- `Authorization: Bearer <restricted plugin token>`
+- `Content-Type: application/json`
+- `X-TcCrew-Player: <normalized player identity>`
+- `X-Idempotency-Key: <unique write request id>` for create/join/leave/close
+- `X-Plugin-Version: <plugin version>`
+
+### Model Summary
+
+The client expects:
+
+- categories with `id`, `key`, `displayName`, `description`, `enabled`, `displayOrder`
+- groups with `id`, `version`, `category`, `activity`, `description`, `startTime`, `maximumPlayers`, `status`, `source`, `creator`, `members`, `permissions`, `discordMessageId`, `createdAt`, `updatedAt`, `expiresAt`
+- members with `playerId`, `rsn`, `discordUserId`, `source`, `joinedAt`
+- permissions with `canJoin`, `canLeave`, `canClose`
+- action responses with `success`, `message`, `group`, and `error`
+
+### Commands
+
+Optional commands are routed locally:
+
+- `!lfg` opens the sidebar
+- `!lfgrefresh` refreshes the list
+- `!lfgleave` leaves your current group when unambiguous
+- `!lfgclose` closes your current closable group when unambiguous
+
+### Local Testing
+
+1. Start RuneLite in developer mode.
+2. Log in with the RuneLite wiki's Jagex Accounts instructions.
+3. Configure `LFG Settings` with a staging Supabase URL and restricted token.
+4. Open the sidebar and confirm one LFG button appears.
+5. Create a group, join from a second client, then leave and close it from either side.
+6. Confirm Discord-created and RuneLite-created groups converge after refresh.
+
+### Security Notes
+
+- The plugin does not contain Supabase service-role keys or Discord bot tokens.
+- The master Discord webhook is sensitive and should be treated as a secret.
+- The backend remains the source of truth for group state.
+- The plugin does not parse Discord message text to infer group state.
+
+The separate backend implementation prompt is in [docs/LFG_SUPABASE_AGENT_PROMPT.md](docs/LFG_SUPABASE_AGENT_PROMPT.md).
 - `!pball` sends only local PB data
 - `!syncall` sends both sections together
 - the plugin does not upload anything when synchronization is disabled

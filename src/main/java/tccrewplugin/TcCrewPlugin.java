@@ -2,6 +2,9 @@ package tccrewplugin;
 
 import com.google.inject.Provides;
 import tccrewplugin.clanchat.ClanChatWebhookManager;
+import tccrewplugin.lfg.LfgNavigationManager;
+import tccrewplugin.lfg.LfgPanel;
+import tccrewplugin.lfg.LfgService;
 import tccrewplugin.sync.ClogPbSyncManager;
 import tccrewplugin.sync.clog.CollectionLogSyncButtonManager;
 import tccrewplugin.notifiers.ChatNotifier;
@@ -68,9 +71,11 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.util.ColorUtil;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.awt.Color;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -87,9 +92,15 @@ public class TcCrewPlugin extends Plugin {
 
     private @Inject ChatMessageManager chatManager;
 
+    private @Inject DinkPluginConfig config;
     private @Inject SettingsManager settingsManager;
     private @Inject ClanEventManager clanEventManager;
     private @Inject ClanChatWebhookManager clanChatWebhookManager;
+    private @Inject LfgService lfgService;
+    @com.google.inject.Inject(optional = true)
+    private Provider<ClientToolbar> clientToolbarProvider;
+    private @Inject LfgPanel lfgPanel;
+    private LfgNavigationManager lfgNavigationManager;
     private @Inject ClogPbSyncManager clogPbSyncManager;
     private @Inject CollectionLogSyncButtonManager collectionLogSyncButtonManager;
     private @Inject RemoteEventManager remoteEventManager;
@@ -144,6 +155,16 @@ public class TcCrewPlugin extends Plugin {
         settingsManager.init();
         clanEventManager.init();
         clanChatWebhookManager.startUp();
+        lfgService.attachPanel(lfgPanel);
+        if (lfgNavigationManager == null && clientToolbarProvider != null)
+        {
+            lfgNavigationManager = new LfgNavigationManager(clientToolbarProvider.get(), lfgPanel, config);
+        }
+        lfgService.startUp();
+        if (lfgNavigationManager != null)
+        {
+            lfgNavigationManager.startUp();
+        }
         clogPbSyncManager.start();
         collectionLogSyncButtonManager.startUp();
         remoteEventManager.startUp();
@@ -163,6 +184,10 @@ public class TcCrewPlugin extends Plugin {
         this.resetNotifiers();
         overlayManager.remove(clanEventOverlay);
         collectionLogSyncButtonManager.shutDown();
+        if (lfgNavigationManager != null) {
+            lfgNavigationManager.shutDown();
+        }
+        lfgService.shutDown();
         clanChatWebhookManager.shutDown();
         clogPbSyncManager.shutdown();
         remoteEventManager.shutDown();
@@ -203,6 +228,7 @@ public class TcCrewPlugin extends Plugin {
         settingsManager.onCommand(event);
         remoteEventManager.onCommand(event);
         chatNotifier.onCommand(event);
+        lfgService.onCommandExecuted(event);
     }
 
     @Subscribe
@@ -220,6 +246,10 @@ public class TcCrewPlugin extends Plugin {
         settingsManager.onConfigChanged(event);
         clanEventManager.onConfigChanged(event.getKey());
         clanChatWebhookManager.onConfigChanged(event.getKey());
+        lfgService.onConfigChanged(event);
+        if (lfgNavigationManager != null) {
+            lfgNavigationManager.onConfigChanged(event);
+        }
         clogPbSyncManager.onConfigChanged(event);
         remoteEventManager.onConfigChanged(event.getKey());
         accountTracker.onConfig(event.getKey());
@@ -256,6 +286,7 @@ public class TcCrewPlugin extends Plugin {
 
         versionManager.onGameState(previousState, newState);
         settingsManager.onGameState(previousState, newState);
+        lfgService.onGameStateChanged(gameStateChanged);
         clogPbSyncManager.onGameStateChanged(gameStateChanged);
         collectionNotifier.onGameState(newState);
         levelNotifier.onGameStateChanged(gameStateChanged);
