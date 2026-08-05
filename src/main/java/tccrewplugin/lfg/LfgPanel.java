@@ -54,8 +54,8 @@ public class LfgPanel extends PluginPanel
 		this.service = service;
 		this.config = config;
 		this.categoryFilterPanel = new LfgCategoryFilterPanel(service::updateVisibleCategories);
-		this.createGroupPanel = new LfgCreateGroupPanel((categoryKey, activity, description, scheduleNow, startTimeText, maximumPlayers) ->
-			service.createGroup(categoryKey, activity, description, scheduleNow, startTimeText, maximumPlayers)
+		this.createGroupPanel = new LfgCreateGroupPanel((categoryKey, activity, description, startTime, maximumPlayers) ->
+			service.createGroup(categoryKey, activity, description, startTime, maximumPlayers)
 		);
 
 		setLayout(new BorderLayout());

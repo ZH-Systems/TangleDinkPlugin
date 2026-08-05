@@ -399,7 +399,7 @@ public interface DinkPluginConfig extends Config {
     @ConfigItem(
         keyName = "lfgSupabaseUrl",
         name = "Supabase URL",
-        description = "Base URL for the Supabase project hosting the Looking For Group backend.",
+        description = "Base URL for the Supabase project hosting the Looking For Group backend. Use the project origin, not a function path.",
         position = 1,
         section = lfgSection
     )

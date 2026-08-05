@@ -46,6 +46,15 @@ public class ApiRequestExecutor
 				try (ResponseBody body = response.body())
 				{
 					String bodyText = body == null ? "" : body.string();
+					if (log.isDebugEnabled() && response.request() != null && response.request().url() != null)
+					{
+						String encodedPath = response.request().url().encodedPath();
+						if (encodedPath.startsWith("/functions/v1/lfg-"))
+						{
+							log.debug("LFG request completed: method={}, url={}, status={}", response.request().method(), response.request().url(), response.code());
+							log.debug("LFG response body: bytes={}, body={}", bodyText.length(), sanitizeBody(bodyText));
+						}
+					}
 					T parsed = null;
 					if (!bodyText.isEmpty() && responseType != null)
 					{

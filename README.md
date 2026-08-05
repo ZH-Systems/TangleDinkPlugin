@@ -286,6 +286,12 @@ The sidebar lets you:
 - close a group you can close
 - see members, status, capacity, source, creator, activity, description, and start time
 
+Account linking is handled in Discord with:
+
+- `/lfg link-account rsn:<your-rsn>`
+
+The plugin does not implement Discord linking itself. If the backend returns an unauthorized response, the client points you back at that Discord command.
+
 ### Configuration
 
 These settings live in the `LFG Settings` config section:

@@ -255,6 +255,11 @@ public class LfgService
 
 	public void createGroup(String categoryKey, String activity, String description, boolean scheduleNow, String startTimeText, Integer maximumPlayers)
 	{
+		createGroup(categoryKey, activity, description, parseInstant(startTimeText), maximumPlayers);
+	}
+
+	public void createGroup(String categoryKey, String activity, String description, Instant startTime, Integer maximumPlayers)
+	{
 		if (!beginMutation())
 		{
 			return;
@@ -264,7 +269,7 @@ public class LfgService
 		LfgRequestValidator.ValidationResult validation;
 		try
 		{
-			validation = validator.validateCreateRequest(categoryKey, activity, description, maximumPlayers, scheduleNow ? null : parseInstant(startTimeText), availableCategories);
+			validation = validator.validateCreateRequest(categoryKey, activity, description, maximumPlayers, startTime, availableCategories);
 		}
 		catch (IllegalArgumentException ex)
 		{
@@ -285,7 +290,7 @@ public class LfgService
 			validation.getCategoryKey(),
 			validation.getActivity(),
 			validation.getDescription(),
-			validation.getStartTime(),
+			validation.getStartTime() == null ? null : validation.getStartTime().toString(),
 			validation.getMaximumPlayers()
 		);
 		String playerHeader = identityProvider.toHeaderValue(identity);
@@ -431,6 +436,14 @@ public class LfgService
 			return;
 		}
 
+		if (result != null && result.getStatusCode() == 401)
+		{
+			String message = linkAccountHint();
+			setError(message);
+			chatWarning(message);
+			return;
+		}
+
 		if (result == null || !result.isSuccess())
 		{
 			String message = sanitizeApiFailure("configuration", result);
@@ -450,6 +463,13 @@ public class LfgService
 		List<LfgCategory> categories = response.getCategories() == null ? List.of() : new ArrayList<>(response.getCategories());
 		categories.sort(Comparator.comparingInt(LfgCategory::getDisplayOrder).thenComparing(category -> StringUtils.defaultString(category.getKey())));
 		allCategories = categories;
+		List<LfgCategory> visibleCategories = LfgCategoryFilter.filterCategories(categories, config.lfgVisibleCategories());
+		log.debug(
+			"LFG categories loaded: total={}, visible={}, allowlist='{}'",
+			categories.size(),
+			visibleCategories.size(),
+			StringUtils.defaultIfBlank(config.lfgVisibleCategories(), "<blank>")
+		);
 		if (categories.isEmpty())
 		{
 			setError("No LFG categories are available.");
@@ -474,6 +494,14 @@ public class LfgService
 		{
 			setError(LfgErrorSanitizer.sanitizeThrowable(throwable, secrets()));
 			chatWarning(errorMessage);
+			return;
+		}
+
+		if (result != null && result.getStatusCode() == 401)
+		{
+			String message = linkAccountHint();
+			setError(message);
+			chatWarning(message);
 			return;
 		}
 
@@ -515,6 +543,27 @@ public class LfgService
 				chatWarning(message);
 				return;
 			}
+			if (result != null && result.getStatusCode() == 401)
+			{
+				String message = linkAccountHint();
+				setError(message);
+				chatWarning(message);
+				return;
+			}
+
+			LfgActionResponse response = result == null ? null : result.getBody();
+			if (response != null && !response.isSuccess())
+			{
+				String message = StringUtils.defaultIfBlank(response.getMessage(), "Action failed.");
+				String errorMessage = StringUtils.defaultIfBlank(response.getErrorMessage(), "");
+				if (StringUtils.isNotBlank(errorMessage))
+				{
+					message = message + ": " + errorMessage;
+				}
+				setError(message);
+				chatWarning(message);
+				return;
+			}
 			if (result == null || !result.isSuccess())
 			{
 				String message = sanitizeApiFailure(action, result);
@@ -522,8 +571,6 @@ public class LfgService
 				chatWarning(message);
 				return;
 			}
-
-			LfgActionResponse response = result.getBody();
 			if (response != null && StringUtils.isNotBlank(response.getMessage()))
 			{
 				statusMessage = response.getMessage();
@@ -649,6 +696,11 @@ public class LfgService
 		String error = result == null ? "unknown error" : result.getError();
 		String message = StringUtils.defaultIfBlank(error, "HTTP " + (result == null ? -1 : result.getStatusCode()));
 		return operation + " failed: " + LfgErrorSanitizer.sanitize(message, secrets());
+	}
+
+	private String linkAccountHint()
+	{
+		return "Link your RuneScape account in Discord with /lfg link-account rsn:<your-rsn>.";
 	}
 
 	private void chatSuccess(String message)

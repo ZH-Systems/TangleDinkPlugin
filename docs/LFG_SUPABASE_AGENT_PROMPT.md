@@ -22,6 +22,12 @@ The backend is authoritative for group state.
 
 The RuneLite client treats Discord and RuneLite as projections of that source of truth.
 
+Discord account linking for the live bot surface uses:
+
+- `/lfg link-account rsn:<your-rsn>`
+
+Do not direct users to a nonexistent `/lfg link code` flow.
+
 ## Client contract
 
 The RuneLite client calls these endpoints:

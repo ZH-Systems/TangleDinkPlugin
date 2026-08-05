@@ -15,20 +15,21 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Font;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 public class LfgCreateGroupPanel extends JPanel
 {
 	public interface CreateHandler
 	{
-		void onCreate(String categoryKey, String activity, String description, boolean scheduleNow, String startTimeText, Integer maximumPlayers);
+		void onCreate(String categoryKey, String activity, String description, Instant startTime, Integer maximumPlayers);
 	}
 
 	private final JComboBox<LfgCategory> categoryBox = new JComboBox<>();
 	private final JTextField activityField = new JTextField();
 	private final JTextField descriptionField = new JTextField();
-	private final JComboBox<String> startModeBox = new JComboBox<>(new String[]{"Now", "Scheduled"});
-	private final JTextField startTimeField = new JTextField();
+	private final JComboBox<StartTimeOption> startTimeBox = new JComboBox<>(StartTimeOption.values());
 	private final JTextField maximumPlayersField = new JTextField();
 	private final JButton createButton = new JButton("Create Group");
 
@@ -54,31 +55,27 @@ public class LfgCreateGroupPanel extends JPanel
 		gbc.gridy = 0;
 		addRow(form, gbc, "Category", categoryBox);
 		addRow(form, gbc, "Activity", activityField);
-		addRow(form, gbc, "Start", startModeBox);
-		addRow(form, gbc, "Start Time", startTimeField);
+		addRow(form, gbc, "Start Time", startTimeBox);
 		addRow(form, gbc, "Maximum Players", maximumPlayersField);
 		addRow(form, gbc, "Description", descriptionField);
 
-		startTimeField.setEnabled(false);
-		startModeBox.addActionListener(e -> startTimeField.setEnabled("Scheduled".equals(startModeBox.getSelectedItem())));
 		LfgUiStyle.styleTextField(activityField);
 		LfgUiStyle.styleTextField(descriptionField);
-		LfgUiStyle.styleTextField(startTimeField);
 		LfgUiStyle.styleTextField(maximumPlayersField);
 		LfgUiStyle.styleComboBox(categoryBox);
-		LfgUiStyle.styleComboBox(startModeBox);
+		LfgUiStyle.styleComboBox(startTimeBox);
 
 		LfgUiStyle.stylePrimaryButton(createButton);
 		createButton.addActionListener(e -> {
 			if (handler != null)
 			{
 				LfgCategory category = (LfgCategory) categoryBox.getSelectedItem();
+				StartTimeOption startTimeOption = (StartTimeOption) startTimeBox.getSelectedItem();
 				handler.onCreate(
 					category == null ? "" : category.getKey(),
 					activityField.getText(),
 					descriptionField.getText(),
-					"Now".equals(startModeBox.getSelectedItem()),
-					startTimeField.getText(),
+					startTimeOption == null ? null : startTimeOption.toInstant(),
 					parseMaximumPlayers(maximumPlayersField.getText())
 				);
 			}
@@ -110,9 +107,8 @@ public class LfgCreateGroupPanel extends JPanel
 		categoryBox.setEnabled(!busy);
 		activityField.setEnabled(!busy);
 		descriptionField.setEnabled(!busy);
-		startModeBox.setEnabled(!busy);
+		startTimeBox.setEnabled(!busy);
 		maximumPlayersField.setEnabled(!busy);
-		startTimeField.setEnabled(!busy && "Scheduled".equals(startModeBox.getSelectedItem()));
 	}
 
 	private void addRow(JPanel form, GridBagConstraints gbc, String label, java.awt.Component component)
@@ -143,6 +139,36 @@ public class LfgCreateGroupPanel extends JPanel
 		catch (NumberFormatException ex)
 		{
 			return null;
+		}
+	}
+
+	private enum StartTimeOption
+	{
+		NOW("Now", null),
+		IN_30_MINUTES("In 30 minutes", Duration.ofMinutes(30)),
+		IN_1_HOUR("In 1 hour", Duration.ofHours(1)),
+		IN_2_HOURS("In 2 hours", Duration.ofHours(2)),
+		IN_4_HOURS("In 4 hours", Duration.ofHours(4)),
+		IN_8_HOURS("In 8 hours", Duration.ofHours(8));
+
+		private final String label;
+		private final Duration offset;
+
+		StartTimeOption(String label, Duration offset)
+		{
+			this.label = label;
+			this.offset = offset;
+		}
+
+		Instant toInstant()
+		{
+			return offset == null ? null : Instant.now().plus(offset);
+		}
+
+		@Override
+		public String toString()
+		{
+			return label;
 		}
 	}
 }

@@ -2,6 +2,7 @@ package tccrewplugin.lfg;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.RuneScapeProfileType;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -19,6 +20,7 @@ import tccrewplugin.sync.model.PlayerIdentity;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public class LfgApiClient extends ApiClient
 {
 	private final ApiRequestExecutor executor;
@@ -31,10 +33,14 @@ public class LfgApiClient extends ApiClient
 
 	public CompletableFuture<ApiResult<LfgConfigurationResponse>> fetchConfiguration(String baseUrl, String apiToken, String playerHeader, String pluginVersion)
 	{
-		HttpUrl url = parseUrl(baseUrl, "/functions/v1/lfg-config");
+		HttpUrl url = parseUrl(normalizeBaseUrl(baseUrl), "/functions/v1/lfg-config");
 		if (url == null)
 		{
 			return CompletableFuture.completedFuture(new ApiResult<>(-1, null, "Invalid LFG Supabase URL."));
+		}
+		if (log.isDebugEnabled())
+		{
+			log.debug("LFG config request URL: {}", url);
 		}
 		Request request = requestBuilder(url.toString())
 			.get()
@@ -48,10 +54,14 @@ public class LfgApiClient extends ApiClient
 
 	public CompletableFuture<ApiResult<LfgGroupsResponse>> fetchGroups(String baseUrl, String apiToken, String playerHeader, String pluginVersion)
 	{
-		HttpUrl url = parseUrl(baseUrl, "/functions/v1/lfg-groups");
+		HttpUrl url = parseUrl(normalizeBaseUrl(baseUrl), "/functions/v1/lfg-groups");
 		if (url == null)
 		{
 			return CompletableFuture.completedFuture(new ApiResult<>(-1, null, "Invalid LFG Supabase URL."));
+		}
+		if (log.isDebugEnabled())
+		{
+			log.debug("LFG groups request URL: {}", url);
 		}
 		Request request = requestBuilder(url.toString())
 			.get()
@@ -65,7 +75,7 @@ public class LfgApiClient extends ApiClient
 
 	public CompletableFuture<ApiResult<LfgActionResponse>> createGroup(String baseUrl, String apiToken, String playerHeader, String pluginVersion, String idempotencyKey, CreateLfgGroupRequest requestBody)
 	{
-		HttpUrl url = parseUrl(baseUrl, "/functions/v1/lfg-groups");
+		HttpUrl url = parseUrl(normalizeBaseUrl(baseUrl), "/functions/v1/lfg-groups");
 		if (url == null)
 		{
 			return CompletableFuture.completedFuture(new ApiResult<>(-1, null, "Invalid LFG Supabase URL."));
@@ -84,7 +94,7 @@ public class LfgApiClient extends ApiClient
 
 	public CompletableFuture<ApiResult<LfgActionResponse>> actOnGroup(String baseUrl, String apiToken, String playerHeader, String pluginVersion, LfgActionRequest requestBody)
 	{
-		HttpUrl url = parseUrl(baseUrl, "/functions/v1/lfg-group-action");
+		HttpUrl url = parseUrl(normalizeBaseUrl(baseUrl), "/functions/v1/lfg-group-action");
 		if (url == null)
 		{
 			return CompletableFuture.completedFuture(new ApiResult<>(-1, null, "Invalid LFG Supabase URL."));
@@ -109,5 +119,20 @@ public class LfgApiClient extends ApiClient
 	private String safe(String value)
 	{
 		return value == null ? "" : value;
+	}
+
+	private String normalizeBaseUrl(String baseUrl)
+	{
+		HttpUrl url = HttpUrl.parse(baseUrl);
+		if (url == null)
+		{
+			return baseUrl;
+		}
+		return url.newBuilder()
+			.encodedPath("/")
+			.query(null)
+			.fragment(null)
+			.build()
+			.toString();
 	}
 }
