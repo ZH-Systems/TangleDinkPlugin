@@ -297,7 +297,7 @@ public class LfgService
 		String idempotencyKey = UUID.randomUUID().toString();
 		setLoading(true);
 		apiClient.createGroup(config.lfgSupabaseUrl(), config.lfgApiToken(), playerHeader, PluginConstants.VERSION, idempotencyKey, request)
-			.whenComplete((result, throwable) -> handleActionResult("create", result, throwable, true));
+			.whenComplete((result, throwable) -> handleActionResult("create", "", result, throwable, true));
 	}
 
 	public void joinGroup(String groupId)
