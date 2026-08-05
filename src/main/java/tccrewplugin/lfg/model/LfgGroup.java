@@ -1,8 +1,10 @@
 package tccrewplugin.lfg.model;
 
+import com.google.gson.annotations.JsonAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tccrewplugin.util.InstantAdapter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class LfgGroup
 	private LfgCategory category;
 	private String activity;
 	private String description;
+	@JsonAdapter(InstantAdapter.class)
 	private Instant startTime;
 	private Integer maximumPlayers;
 	private LfgGroupStatus status;
@@ -26,7 +29,10 @@ public class LfgGroup
 	private List<LfgMember> members = new ArrayList<>();
 	private LfgPermissions permissions;
 	private String discordMessageId;
+	@JsonAdapter(InstantAdapter.class)
 	private Instant createdAt;
+	@JsonAdapter(InstantAdapter.class)
 	private Instant updatedAt;
+	@JsonAdapter(InstantAdapter.class)
 	private Instant expiresAt;
 }
