@@ -138,6 +138,12 @@ The webhook sender supports:
 
 The plugin also includes a client-side collection-log and personal-best sync path.
 
+## LFG Integration
+
+The LFG panel now expects its category and activity catalog to come from the shared Supabase backend. In the intended setup, the Discord bot syncs its `roleMenu.js` definitions into Supabase, so RuneLite shows the same categories and activities that Discord uses for `/lfg-roles` and `/lfg-post`.
+
+Groups created from RuneLite still go through the same Supabase LFG endpoints, and the existing Discord delivery worker can publish RuneLite-created groups into Discord. Discord-created forum groups can also be mirrored back into the same backend, which lets the plugin browse groups that originated in Discord instead of only local RuneLite-created rows.
+
 It reads locally available collection-log state, reads the same personal-best values RuneLite stores for `!pb`, and sends versioned JSON to a webhook you configure.
 
 ### Configuration

@@ -22,6 +22,7 @@ import tccrewplugin.clanchat.model.ClanWebhookPayload.Player;
 import tccrewplugin.clanchat.model.ClanWebhookStatus;
 import tccrewplugin.util.TextSanitizer;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.ArrayDeque;
@@ -65,6 +66,7 @@ public class ClanChatService
 	private final AtomicInteger retriedCount = new AtomicInteger();
 	private volatile boolean deliveriesPaused;
 
+	@Inject
 	public ClanChatService(Client client, ClientThread clientThread, TangleDinkConfig config, Gson gson, ScheduledExecutorService executor, OkHttpClient httpClient)
 	{
 		this.client = client;

@@ -6,6 +6,7 @@ import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 import tccrewplugin.sync.PlayerSyncService;
 
+import javax.inject.Inject;
 import javax.swing.JComponent;
 
 public class AccountFeature implements PluginFeature
@@ -13,6 +14,7 @@ public class AccountFeature implements PluginFeature
 	private final TangleDinkConfig config;
 	private final AccountPanel panel;
 
+	@Inject
 	public AccountFeature(TangleDinkConfig config, PlayerSyncService playerSyncService, ClanChatService clanChatService)
 	{
 		this.config = config;

@@ -5,6 +5,7 @@ import tccrewplugin.collectionlog.CollectionLogService;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 
+import javax.inject.Inject;
 import javax.swing.JComponent;
 
 public class CollectionLogFeature implements PluginFeature
@@ -12,6 +13,7 @@ public class CollectionLogFeature implements PluginFeature
 	private final TangleDinkConfig config;
 	private final CollectionLogPanel panel;
 
+	@Inject
 	public CollectionLogFeature(TangleDinkConfig config, CollectionLogService collectionLogService)
 	{
 		this.config = config;

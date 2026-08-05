@@ -1,6 +1,7 @@
 package tccrewplugin.lfg.ui;
 
 import net.runelite.client.ui.ColorScheme;
+import tccrewplugin.lfg.model.LfgActivity;
 import tccrewplugin.lfg.model.LfgCategory;
 
 import javax.swing.BorderFactory;
@@ -27,7 +28,7 @@ public class LfgCreateGroupPanel extends JPanel
 	}
 
 	private final JComboBox<LfgCategory> categoryBox = new JComboBox<>();
-	private final JTextField activityField = new JTextField();
+	private final JComboBox<LfgActivity> activityBox = new JComboBox<>();
 	private final JTextField descriptionField = new JTextField();
 	private final JComboBox<StartTimeOption> startTimeBox = new JComboBox<>(StartTimeOption.values());
 	private final JTextField maximumPlayersField = new JTextField();
@@ -54,26 +55,30 @@ public class LfgCreateGroupPanel extends JPanel
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		addRow(form, gbc, "Category", categoryBox);
-		addRow(form, gbc, "Activity", activityField);
+		addRow(form, gbc, "Activity", activityBox);
 		addRow(form, gbc, "Start Time", startTimeBox);
 		addRow(form, gbc, "Maximum Players", maximumPlayersField);
 		addRow(form, gbc, "Description", descriptionField);
 
-		LfgUiStyle.styleTextField(activityField);
 		LfgUiStyle.styleTextField(descriptionField);
 		LfgUiStyle.styleTextField(maximumPlayersField);
 		LfgUiStyle.styleComboBox(categoryBox);
+		LfgUiStyle.styleComboBox(activityBox);
 		LfgUiStyle.styleComboBox(startTimeBox);
+
+		categoryBox.addActionListener(e -> refreshActivities());
+		activityBox.addActionListener(e -> applySelectedActivityDefaults());
 
 		LfgUiStyle.stylePrimaryButton(createButton);
 		createButton.addActionListener(e -> {
 			if (handler != null)
 			{
 				LfgCategory category = (LfgCategory) categoryBox.getSelectedItem();
+				LfgActivity activity = (LfgActivity) activityBox.getSelectedItem();
 				StartTimeOption startTimeOption = (StartTimeOption) startTimeBox.getSelectedItem();
 				handler.onCreate(
 					category == null ? "" : category.getKey(),
-					activityField.getText(),
+					activity == null ? "" : activity.getKey(),
 					descriptionField.getText(),
 					startTimeOption == null ? null : startTimeOption.toInstant(),
 					parseMaximumPlayers(maximumPlayersField.getText())
@@ -99,16 +104,73 @@ public class LfgCreateGroupPanel extends JPanel
 				categoryBox.addItem(category);
 			}
 		}
+		refreshActivities();
 	}
 
 	public void setBusy(boolean busy)
 	{
 		createButton.setEnabled(!busy);
 		categoryBox.setEnabled(!busy);
-		activityField.setEnabled(!busy);
+		activityBox.setEnabled(!busy);
 		descriptionField.setEnabled(!busy);
 		startTimeBox.setEnabled(!busy);
 		maximumPlayersField.setEnabled(!busy);
+	}
+
+	private void refreshActivities()
+	{
+		LfgActivity current = (LfgActivity) activityBox.getSelectedItem();
+		String currentKey = current == null ? "" : String.valueOf(current.getKey());
+		activityBox.removeAllItems();
+		LfgCategory category = (LfgCategory) categoryBox.getSelectedItem();
+		if (category != null && category.getActivities() != null)
+		{
+			for (LfgActivity activity : category.getActivities())
+			{
+				if (activity != null && activity.isEnabled())
+				{
+					activityBox.addItem(activity);
+				}
+			}
+		}
+		for (int i = 0; i < activityBox.getItemCount(); i++)
+		{
+			LfgActivity item = activityBox.getItemAt(i);
+			if (item != null && currentKey.equalsIgnoreCase(String.valueOf(item.getKey())))
+			{
+				activityBox.setSelectedIndex(i);
+				applySelectedActivityDefaults();
+				return;
+			}
+		}
+		if (activityBox.getItemCount() > 0)
+		{
+			activityBox.setSelectedIndex(0);
+		}
+		else
+		{
+			maximumPlayersField.setText("");
+		}
+		applySelectedActivityDefaults();
+	}
+
+	private void applySelectedActivityDefaults()
+	{
+		LfgActivity activity = (LfgActivity) activityBox.getSelectedItem();
+		if (activity == null)
+		{
+			maximumPlayersField.setText("");
+			return;
+		}
+		Integer maximumPlayers = activity.getMaximumPlayers();
+		if (maximumPlayers != null)
+		{
+			maximumPlayersField.setText(String.valueOf(maximumPlayers));
+		}
+		else if (activity.isSupportsMass())
+		{
+			maximumPlayersField.setText("");
+		}
 	}
 
 	private void addRow(JPanel form, GridBagConstraints gbc, String label, java.awt.Component component)

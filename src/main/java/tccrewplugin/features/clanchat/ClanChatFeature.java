@@ -5,6 +5,7 @@ import tccrewplugin.clanchat.ClanChatService;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 
+import javax.inject.Inject;
 import javax.swing.JComponent;
 
 public class ClanChatFeature implements PluginFeature
@@ -12,6 +13,7 @@ public class ClanChatFeature implements PluginFeature
 	private final TangleDinkConfig config;
 	private final ClanChatPanel panel;
 
+	@Inject
 	public ClanChatFeature(TangleDinkConfig config, ClanChatService clanChatService)
 	{
 		this.config = config;

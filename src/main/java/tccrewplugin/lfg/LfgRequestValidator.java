@@ -4,34 +4,42 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import tccrewplugin.lfg.model.LfgActivity;
 import tccrewplugin.lfg.model.LfgCategory;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class LfgRequestValidator
 {
 	public ValidationResult validateCreateRequest(
 		String categoryKey,
-		String activity,
+		String activityKey,
 		String description,
 		Integer maximumPlayers,
 		Instant startTime,
-		Set<String> availableCategories
+		List<LfgCategory> availableCategories
 	)
 	{
 		String normalizedCategory = trim(categoryKey);
-		String normalizedActivity = trim(activity);
+		String normalizedActivityKey = trim(activityKey);
 		String normalizedDescription = trim(description);
 
-		if (StringUtils.isBlank(normalizedCategory) || availableCategories == null || !availableCategories.contains(normalizedCategory.toLowerCase()))
+		LfgCategory category = findCategory(normalizedCategory, availableCategories);
+		if (category == null)
 		{
 			return ValidationResult.invalid("Choose a valid category.");
 		}
+		LfgActivity activity = findActivity(category, normalizedActivityKey);
+		if (activity == null)
+		{
+			return ValidationResult.invalid("Choose a valid activity.");
+		}
+		String normalizedActivity = trim(activity.getDisplayName());
 		if (!isTextAllowed(normalizedActivity) || normalizedActivity.length() < 1 || normalizedActivity.length() > 80)
 		{
-			return ValidationResult.invalid("Activity must be between 1 and 80 characters.");
+			return ValidationResult.invalid("Selected activity is invalid.");
 		}
 		if (!isTextAllowed(normalizedDescription) || normalizedDescription.length() > 300)
 		{
@@ -49,6 +57,7 @@ public class LfgRequestValidator
 			true,
 			"",
 			normalizedCategory,
+			normalizedActivityKey,
 			normalizedActivity,
 			normalizedDescription,
 			maximumPlayers,
@@ -62,7 +71,7 @@ public class LfgRequestValidator
 		{
 			return ValidationResult.invalid("Select a valid group first.");
 		}
-		return ValidationResult.valid(new ValidationResult(true, "", trim(groupId), null, null, null, null));
+		return ValidationResult.valid(new ValidationResult(true, "", trim(groupId), "", "", "", null, null));
 	}
 
 	private boolean isTextAllowed(String value)
@@ -86,6 +95,38 @@ public class LfgRequestValidator
 		return value == null ? "" : value.trim().replace('\u00A0', ' ');
 	}
 
+	private LfgCategory findCategory(String categoryKey, List<LfgCategory> availableCategories)
+	{
+		if (StringUtils.isBlank(categoryKey) || availableCategories == null)
+		{
+			return null;
+		}
+		for (LfgCategory category : availableCategories)
+		{
+			if (category != null && category.getKey() != null && categoryKey.equalsIgnoreCase(category.getKey().trim()))
+			{
+				return category;
+			}
+		}
+		return null;
+	}
+
+	private LfgActivity findActivity(LfgCategory category, String activityKey)
+	{
+		if (category == null || StringUtils.isBlank(activityKey) || category.getActivities() == null)
+		{
+			return null;
+		}
+		for (LfgActivity activity : category.getActivities())
+		{
+			if (activity != null && activity.getKey() != null && activityKey.equalsIgnoreCase(activity.getKey().trim()))
+			{
+				return activity;
+			}
+		}
+		return null;
+	}
+
 	@Getter
 	@AllArgsConstructor
 	public static final class ValidationResult
@@ -93,6 +134,7 @@ public class LfgRequestValidator
 		private final boolean valid;
 		private final String message;
 		private final String categoryKey;
+		private final String activityKey;
 		private final String activity;
 		private final String description;
 		private final Integer maximumPlayers;
@@ -100,7 +142,7 @@ public class LfgRequestValidator
 
 		private static ValidationResult invalid(String message)
 		{
-			return new ValidationResult(false, message, "", "", "", null, null);
+			return new ValidationResult(false, message, "", "", "", "", null, null);
 		}
 
 		private static ValidationResult valid(ValidationResult result)

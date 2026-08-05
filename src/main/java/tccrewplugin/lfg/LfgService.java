@@ -265,7 +265,7 @@ public class LfgService
 			return;
 		}
 		PlayerIdentity identity = currentIdentity;
-		Set<String> availableCategories = getAllowedCategoryKeys();
+		List<LfgCategory> availableCategories = filterCategories();
 		LfgRequestValidator.ValidationResult validation;
 		try
 		{
