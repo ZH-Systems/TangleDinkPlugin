@@ -338,9 +338,8 @@ public class LfgService
 
 	private void performCurrentPlayerAction(String action)
 	{
-		String currentPlayer = currentIdentity == null ? "" : currentIdentity.getUsername();
 		List<LfgGroup> matches = allGroups.stream()
-			.filter(group -> isCurrentPlayerMember(group, currentPlayer) && group.getPermissions() != null && group.getPermissions().isCanLeave())
+			.filter(group -> group != null && group.getPermissions() != null && group.getPermissions().isCanLeave())
 			.collect(Collectors.toList());
 		if (matches.isEmpty())
 		{

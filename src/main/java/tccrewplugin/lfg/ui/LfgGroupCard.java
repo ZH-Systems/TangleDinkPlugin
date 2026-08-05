@@ -136,10 +136,10 @@ public class LfgGroupCard extends JPanel
 			description.setToolTipText(desc);
 		}
 
-		boolean currentMember = isCurrentMember(group, currentPlayerId);
 		boolean canClose = group.getPermissions() != null && group.getPermissions().isCanClose();
-		boolean canLeave = currentMember && group.getPermissions() != null && group.getPermissions().isCanLeave();
-		boolean canJoin = !currentMember && group.getPermissions() != null && group.getPermissions().isCanJoin();
+		boolean canLeave = group.getPermissions() != null && group.getPermissions().isCanLeave();
+		boolean canJoin = group.getPermissions() != null && group.getPermissions().isCanJoin();
+		boolean currentMember = canLeave || isCurrentMember(group, currentPlayerId);
 
 		JButton primary = new JButton(currentMember ? "Leave" : "Join");
 		LfgUiStyle.stylePrimaryButton(primary);
