@@ -687,6 +687,7 @@ public class LfgService
 				continue;
 			}
 			if (group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.CLOSED
+				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.STARTED
 				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.CANCELLED
 				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.EXPIRED)
 			{
