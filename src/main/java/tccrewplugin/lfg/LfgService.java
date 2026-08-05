@@ -333,7 +333,7 @@ public class LfgService
 		LfgActionRequest request = new LfgActionRequest(action, validation.getCategoryKey(), UUID.randomUUID().toString());
 		setLoading(true);
 		apiClient.actOnGroup(config.lfgSupabaseUrl(), config.lfgApiToken(), identityProvider.toHeaderValue(currentIdentity), PluginConstants.VERSION, request)
-			.whenComplete((result, throwable) -> handleActionResult(action, result, throwable, false));
+			.whenComplete((result, throwable) -> handleActionResult(action, validation.getCategoryKey(), result, throwable, false));
 	}
 
 	private void performCurrentPlayerAction(String action)
@@ -531,7 +531,7 @@ public class LfgService
 		publishState();
 	}
 
-	private void handleActionResult(String action, ApiResult<LfgActionResponse> result, Throwable throwable, boolean refreshAfter)
+	private void handleActionResult(String action, String groupId, ApiResult<LfgActionResponse> result, Throwable throwable, boolean refreshAfter)
 	{
 		boolean shouldRefresh = false;
 		try
@@ -574,6 +574,12 @@ public class LfgService
 			if (response != null && StringUtils.isNotBlank(response.getMessage()))
 			{
 				statusMessage = response.getMessage();
+			}
+			if (StringUtils.equalsAnyIgnoreCase(action, "leave", "close") && StringUtils.isNotBlank(groupId))
+			{
+				allGroups = allGroups.stream()
+					.filter(group -> group != null && !groupId.equals(group.getId()))
+					.collect(Collectors.toList());
 			}
 			setError("");
 			chatSuccess(StringUtils.defaultIfBlank(action, "Action") + " completed.");
