@@ -6,3 +6,4 @@
 - Added a protected Supabase function for syncing the Discord activity catalog and updated documentation to describe the shared Discord/RuneLite LFG setup.
 - Updated the RuneLite LFG sidebar card renderer so member names display one per line instead of a single comma-separated row.
 - Updated the RuneLite LFG list logic so started/ongoing groups stay visible and joinable instead of disappearing as soon as their scheduled start time passes.
+- Added a `Current Event` line to the RuneLite LFG sidebar status card so a player’s joined active event is shown directly in the panel header.

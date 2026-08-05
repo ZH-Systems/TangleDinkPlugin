@@ -14,6 +14,7 @@ import java.awt.Font;
 public class LfgStatusPanel extends JPanel
 {
 	private final JLabel playerLabel = new JLabel("Player: -");
+	private final JLabel currentEventLabel = new JLabel("Current Event: -");
 	private final JLabel statusLabel = new JLabel("Status: -");
 	private final JLabel errorLabel = new JLabel("");
 
@@ -27,6 +28,9 @@ public class LfgStatusPanel extends JPanel
 		playerLabel.setForeground(Color.WHITE);
 		playerLabel.setFont(playerLabel.getFont().deriveFont(Font.BOLD, 12f));
 		playerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		currentEventLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		currentEventLabel.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+		currentEventLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		statusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		statusLabel.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
 		statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -36,6 +40,7 @@ public class LfgStatusPanel extends JPanel
 		errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		add(playerLabel);
+		add(currentEventLabel);
 		add(statusLabel);
 		add(errorLabel);
 	}
@@ -48,6 +53,12 @@ public class LfgStatusPanel extends JPanel
 	public void setStatus(String status)
 	{
 		statusLabel.setText("Status: " + (status == null || status.isBlank() ? "-" : status));
+	}
+
+	public void setCurrentEvent(String currentEvent)
+	{
+		currentEventLabel.setText("Current Event: " + (currentEvent == null || currentEvent.isBlank() ? "-" : currentEvent));
+		currentEventLabel.setToolTipText(currentEvent == null || currentEvent.isBlank() || "-".equals(currentEvent) ? null : currentEvent);
 	}
 
 	public void setError(String error)

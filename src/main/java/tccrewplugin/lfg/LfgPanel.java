@@ -122,6 +122,7 @@ public class LfgPanel extends PluginPanel
 		List<LfgCategory> categories,
 		List<LfgGroup> groups,
 		tccrewplugin.sync.model.PlayerIdentity identity,
+		String currentEvent,
 		String status,
 		String error,
 		String allowList,
@@ -132,6 +133,7 @@ public class LfgPanel extends PluginPanel
 	)
 	{
 		statusPanel.setPlayer(identity == null ? "" : identity.getUsername());
+		statusPanel.setCurrentEvent(currentEvent);
 		statusPanel.setStatus(status);
 		statusPanel.setError(error);
 		categoryFilterPanel.setCategories(categories, allowList);

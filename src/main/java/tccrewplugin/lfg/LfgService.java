@@ -643,8 +643,9 @@ public class LfgService
 		String allowList = config.lfgVisibleCategories();
 		String error = errorMessage;
 		String status = statusMessage;
+		String currentEvent = buildCurrentEventLabel(identity);
 		boolean busy = refreshInFlight.get() || mutationInFlight.get();
-		SwingUtilities.invokeLater(() -> currentPanel.updateState(categories, groups, identity, status, error, allowList, config.lfgShowFullGroups(), config.lfgShowDiscordGroups(), config.lfgShowRuneLiteGroups(), busy));
+		SwingUtilities.invokeLater(() -> currentPanel.updateState(categories, groups, identity, currentEvent, status, error, allowList, config.lfgShowFullGroups(), config.lfgShowDiscordGroups(), config.lfgShowRuneLiteGroups(), busy));
 	}
 
 	private List<LfgCategory> filterCategories()
@@ -799,6 +800,64 @@ public class LfgService
 		}
 		return group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.OPEN
 			|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.STARTED;
+	}
+
+	private String buildCurrentEventLabel(PlayerIdentity identity)
+	{
+		LfgGroup activeGroup = findCurrentPlayerActiveGroup(identity);
+		if (activeGroup == null)
+		{
+			return "-";
+		}
+
+		String category = activeGroup.getCategory() == null
+			? "LFG"
+			: StringUtils.defaultIfBlank(activeGroup.getCategory().getDisplayName(), "LFG");
+		String activity = StringUtils.defaultIfBlank(activeGroup.getActivity(), "Unknown");
+		return category + ": " + activity;
+	}
+
+	private LfgGroup findCurrentPlayerActiveGroup(PlayerIdentity identity)
+	{
+		if (identity == null || StringUtils.isBlank(identity.getUsername()) || allGroups.isEmpty())
+		{
+			return null;
+		}
+
+		return allGroups.stream()
+			.filter(Objects::nonNull)
+			.filter(group -> group.getStatus() != null)
+			.filter(group ->
+				group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CLOSED
+				&& group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CANCELLED
+				&& group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.EXPIRED)
+			.filter(group -> isCurrentPlayerMember(group, identity.getUsername()))
+			.sorted(Comparator
+				.comparingInt(this::currentEventPriority)
+				.thenComparing(group -> group.getStartTime() == null ? Instant.MAX : group.getStartTime()))
+			.findFirst()
+			.orElse(null);
+	}
+
+	private int currentEventPriority(LfgGroup group)
+	{
+		if (group == null || group.getStatus() == null)
+		{
+			return Integer.MAX_VALUE;
+		}
+		if (group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.STARTED)
+		{
+			return 0;
+		}
+		if (group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.OPEN)
+		{
+			return 1;
+		}
+		if (group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.FULL)
+		{
+			return 2;
+		}
+		return 3;
 	}
 
 	private boolean isOwnedByCurrentPlayer(LfgGroup group, PlayerIdentity identity)
