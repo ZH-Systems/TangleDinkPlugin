@@ -108,16 +108,21 @@ public class LfgGroupCard extends JPanel
 		details.setText(String.format("Start: %s  \u2022  Players: %s", start, players));
 
 		List<LfgMember> memberList = group.getMembers() == null ? List.of() : group.getMembers();
-		String memberNames = memberList.stream()
+		List<String> memberNames = memberList.stream()
 			.map(LfgMember::getRsn)
 			.filter(StringUtils::isNotBlank)
-			.collect(Collectors.joining(", "));
-		if (memberNames.isBlank())
+			.collect(Collectors.toList());
+		if (memberNames.isEmpty())
 		{
-			memberNames = "None";
+			members.setText("Members: None");
+			members.setToolTipText(null);
 		}
-		members.setText("Members: " + memberNames);
-		members.setToolTipText(memberNames.length() > 120 ? memberNames : null);
+		else
+		{
+			members.setText(buildMembersHtml(memberNames));
+			String tooltip = String.join(", ", memberNames);
+			members.setToolTipText(tooltip.length() > 120 ? tooltip : null);
+		}
 
 		String desc = StringUtils.defaultString(group.getDescription());
 		if (desc.isBlank())
@@ -201,5 +206,21 @@ public class LfgGroupCard extends JPanel
 			return members + " / unlimited";
 		}
 		return members + " / " + maximum;
+	}
+
+	private String buildMembersHtml(List<String> memberNames)
+	{
+		String lines = memberNames.stream()
+			.map(this::escapeHtml)
+			.collect(Collectors.joining("<br>"));
+		return "<html>Members:<br>" + lines + "</html>";
+	}
+
+	private String escapeHtml(String value)
+	{
+		return value
+			.replace("&", "&amp;")
+			.replace("<", "&lt;")
+			.replace(">", "&gt;");
 	}
 }
