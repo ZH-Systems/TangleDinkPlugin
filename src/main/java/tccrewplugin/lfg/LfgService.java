@@ -574,12 +574,7 @@ public class LfgService
 			{
 				statusMessage = response.getMessage();
 			}
-			if (StringUtils.equalsAnyIgnoreCase(action, "leave", "close") && StringUtils.isNotBlank(groupId))
-			{
-				allGroups = allGroups.stream()
-					.filter(group -> group != null && !groupId.equals(group.getId()))
-					.collect(Collectors.toList());
-			}
+			reconcileActionGroup(action, groupId, response);
 			setError("");
 			chatSuccess(StringUtils.defaultIfBlank(action, "Action") + " completed.");
 			shouldRefresh = true;
@@ -818,7 +813,7 @@ public class LfgService
 
 	private LfgGroup findCurrentPlayerActiveGroup(PlayerIdentity identity)
 	{
-		if (identity == null || StringUtils.isBlank(identity.getUsername()) || allGroups.isEmpty())
+		if (identity == null || allGroups.isEmpty())
 		{
 			return null;
 		}
@@ -830,7 +825,7 @@ public class LfgService
 				group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CLOSED
 				&& group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CANCELLED
 				&& group.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.EXPIRED)
-			.filter(group -> isCurrentPlayerMember(group, identity.getUsername()))
+			.filter(group -> isViewerMember(group, identity))
 			.sorted(Comparator
 				.comparingInt(this::currentEventPriority)
 				.thenComparing(group -> group.getStartTime() == null ? Instant.MAX : group.getStartTime()))
@@ -861,7 +856,15 @@ public class LfgService
 
 	private boolean isOwnedByCurrentPlayer(LfgGroup group, PlayerIdentity identity)
 	{
-		if (group == null || identity == null || StringUtils.isBlank(identity.getUsername()))
+		if (group == null || identity == null)
+		{
+			return false;
+		}
+		if (group.getPermissions() != null && (group.getPermissions().isCanClose() || group.getPermissions().isCanLeave()))
+		{
+			return true;
+		}
+		if (StringUtils.isBlank(identity.getUsername()))
 		{
 			return false;
 		}
@@ -876,6 +879,65 @@ public class LfgService
 			}
 		}
 		return isCurrentPlayerMember(group, identity.getUsername());
+	}
+
+	private boolean isViewerMember(LfgGroup group, PlayerIdentity identity)
+	{
+		if (group == null || identity == null)
+		{
+			return false;
+		}
+		if (group.getPermissions() != null && group.getPermissions().isCanLeave())
+		{
+			return true;
+		}
+		return isCurrentPlayerMember(group, identity.getUsername());
+	}
+
+	private void reconcileActionGroup(String action, String groupId, LfgActionResponse response)
+	{
+		if (response == null)
+		{
+			return;
+		}
+		LfgGroup updatedGroup = parseActionGroup(response);
+		if (updatedGroup != null)
+		{
+			allGroups = allGroups.stream()
+				.filter(group -> group != null && !StringUtils.equals(group.getId(), updatedGroup.getId()))
+				.collect(Collectors.toCollection(ArrayList::new));
+			if (updatedGroup.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CLOSED
+				&& updatedGroup.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.CANCELLED
+				&& updatedGroup.getStatus() != tccrewplugin.lfg.model.LfgGroupStatus.EXPIRED)
+			{
+				allGroups.add(updatedGroup);
+			}
+			return;
+		}
+
+		if (StringUtils.equalsAnyIgnoreCase(action, "close") && StringUtils.isNotBlank(groupId))
+		{
+			allGroups = allGroups.stream()
+				.filter(group -> group != null && !groupId.equals(group.getId()))
+				.collect(Collectors.toList());
+		}
+	}
+
+	private LfgGroup parseActionGroup(LfgActionResponse response)
+	{
+		if (response == null || response.getGroup() == null || response.getGroup().isJsonNull())
+		{
+			return null;
+		}
+		try
+		{
+			return gson.fromJson(response.getGroup(), LfgGroup.class);
+		}
+		catch (RuntimeException ex)
+		{
+			log.debug("Unable to parse LFG action group payload", ex);
+			return null;
+		}
 	}
 
 	private String buildAnnouncementKey(LfgGroup group)
