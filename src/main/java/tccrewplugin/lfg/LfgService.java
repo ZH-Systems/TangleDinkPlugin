@@ -687,7 +687,6 @@ public class LfgService
 				continue;
 			}
 			if (group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.CLOSED
-				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.STARTED
 				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.CANCELLED
 				|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.EXPIRED)
 			{
@@ -799,7 +798,7 @@ public class LfgService
 			return false;
 		}
 		return group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.OPEN
-			|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.FULL;
+			|| group.getStatus() == tccrewplugin.lfg.model.LfgGroupStatus.STARTED;
 	}
 
 	private boolean isOwnedByCurrentPlayer(LfgGroup group, PlayerIdentity identity)
