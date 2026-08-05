@@ -577,7 +577,7 @@ public class LfgService
 			}
 			setError("");
 			chatSuccess(StringUtils.defaultIfBlank(action, "Action") + " completed.");
-			shouldRefresh = refreshAfter;
+			shouldRefresh = true;
 		}
 		finally
 		{
