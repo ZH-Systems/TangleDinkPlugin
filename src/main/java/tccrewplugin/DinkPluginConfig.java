@@ -422,24 +422,10 @@ public interface DinkPluginConfig extends Config {
     }
 
     @ConfigItem(
-        keyName = "lfgMasterChannelWebhook",
-        name = "Master Channel Webhook",
-        description = "Discord webhook used for the master Looking For Group channel.",
-        position = 3,
-        section = lfgSection,
-        secret = true,
-        warning = "Anyone with this URL can post to the configured Discord channel."
-    )
-    default String lfgMasterChannelWebhook()
-    {
-        return "";
-    }
-
-    @ConfigItem(
         keyName = "lfgVisibleCategories",
         name = "Visible Categories",
         description = "Comma-separated category keys shown in the RuneLite sidebar. Leave blank to show all enabled categories.",
-        position = 4,
+        position = 3,
         section = lfgSection
     )
     default String lfgVisibleCategories()
@@ -451,7 +437,7 @@ public interface DinkPluginConfig extends Config {
         keyName = "lfgRefreshIntervalSeconds",
         name = "Refresh Interval",
         description = "How often active groups are refreshed while the LFG sidebar is open.",
-        position = 5,
+        position = 4,
         section = lfgSection
     )
     @Range(min = 10, max = 300)
@@ -2755,5 +2741,4 @@ public interface DinkPluginConfig extends Config {
     }
 
 }
-
 

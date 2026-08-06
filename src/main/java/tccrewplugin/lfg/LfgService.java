@@ -207,7 +207,7 @@ public class LfgService
 			return;
 		}
 
-		if ("lfgSupabaseUrl".equals(key) || "lfgApiToken".equals(key) || "lfgMasterChannelWebhook".equals(key))
+		if ("lfgSupabaseUrl".equals(key) || "lfgApiToken".equals(key))
 		{
 			if (loggedIn.get() && enabled.get())
 			{
@@ -576,7 +576,7 @@ public class LfgService
 			}
 			reconcileActionGroup(action, groupId, response);
 			setError("");
-			chatSuccess(StringUtils.defaultIfBlank(action, "Action") + " completed.");
+			chatSuccess(StringUtils.defaultIfBlank(response == null ? null : response.getMessage(), StringUtils.defaultIfBlank(action, "Action") + " completed."));
 			shouldRefresh = true;
 		}
 		finally
@@ -977,10 +977,6 @@ public class LfgService
 		if (StringUtils.isNotBlank(config.lfgApiToken()))
 		{
 			secrets.add(config.lfgApiToken());
-		}
-		if (StringUtils.isNotBlank(config.lfgMasterChannelWebhook()))
-		{
-			secrets.add(config.lfgMasterChannelWebhook());
 		}
 		return secrets;
 	}

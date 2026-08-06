@@ -403,7 +403,7 @@ public class SettingsManager {
             config.notifyLeagues() || config.notifyLevel() || config.notifyLoot() || config.notifyPet() ||
             config.notifyPk() || config.notifyQuest() || config.notifySlayer() || config.notifySpeedrun() ||
             config.lfgEnabled() || !config.lfgSupabaseUrl().isEmpty() || !config.lfgApiToken().isEmpty() ||
-            !config.lfgMasterChannelWebhook().isEmpty() || !config.lfgVisibleCategories().isEmpty() ||
+            !config.lfgVisibleCategories().isEmpty() ||
             config.notifyTrades();
     }
 
@@ -721,5 +721,4 @@ public class SettingsManager {
         );
     }
 }
-
 

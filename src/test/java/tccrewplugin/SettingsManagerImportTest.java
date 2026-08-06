@@ -57,7 +57,6 @@ class SettingsManagerImportTest {
                 descriptor("lfgEnabled"),
                 descriptor("lfgSupabaseUrl"),
                 descriptor("lfgApiToken", true),
-                descriptor("lfgMasterChannelWebhook", true),
                 descriptor("lfgVisibleCategories"),
                 descriptor("ignoredNames")
             )
@@ -158,29 +157,25 @@ class SettingsManagerImportTest {
             SettingsManager.CONFIG_GROUP + ".lfgEnabled",
             SettingsManager.CONFIG_GROUP + ".lfgSupabaseUrl",
             SettingsManager.CONFIG_GROUP + ".lfgApiToken",
-            SettingsManager.CONFIG_GROUP + ".lfgMasterChannelWebhook",
             SettingsManager.CONFIG_GROUP + ".lfgVisibleCategories"
         ));
         when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgEnabled")).thenReturn("true");
         when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgSupabaseUrl")).thenReturn("https://supabase.example");
         when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken")).thenReturn("secret-token");
-        when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgMasterChannelWebhook")).thenReturn("https://discord.example/webhook");
         when(configManager.getConfiguration(SettingsManager.CONFIG_GROUP, "lfgVisibleCategories")).thenReturn("raid,boss");
 
-        Map<String, Object> exported = settingsManager.buildExportConfigMap(key -> !Set.of("lfgApiToken", "lfgMasterChannelWebhook").contains(key));
+        Map<String, Object> exported = settingsManager.buildExportConfigMap(key -> !Set.of("lfgApiToken").contains(key));
 
         verify(configManager).getConfigurationKeys(SettingsManager.CONFIG_GROUP + ".");
         verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgEnabled");
         verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgSupabaseUrl");
         verify(configManager).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgVisibleCategories");
         verify(configManager, never()).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgApiToken");
-        verify(configManager, never()).getConfiguration(SettingsManager.CONFIG_GROUP, "lfgMasterChannelWebhook");
         // The caller-side export filter excludes the secret fields; the helper still returns the non-secret LFG values.
         assertEquals("true", exported.get("lfgEnabled"));
         assertEquals("https://supabase.example", exported.get("lfgSupabaseUrl"));
         assertEquals("raid,boss", exported.get("lfgVisibleCategories"));
         assertFalse(exported.containsKey("lfgApiToken"));
-        assertFalse(exported.containsKey("lfgMasterChannelWebhook"));
     }
 
     private static ConfigItemDescriptor descriptor(String methodName) {

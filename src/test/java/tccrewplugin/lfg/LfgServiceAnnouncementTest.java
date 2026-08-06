@@ -76,7 +76,6 @@ class LfgServiceAnnouncementTest
 		when(config.lfgShowRuneLiteGroups()).thenReturn(true);
 		when(config.lfgSupabaseUrl()).thenReturn("https://example.com");
 		when(config.lfgApiToken()).thenReturn("token");
-		when(config.lfgMasterChannelWebhook()).thenReturn("");
 		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
 
 		LfgService service = new LfgService(client, clientThread, config, configManager, gson, chatMessageManager, executor, httpClient);
