@@ -1,17 +1,13 @@
 package tccrewplugin.lfg.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class CreateLfgGroupRequest
 {
-	private String categoryKey;
-	private String activity;
-	private String description;
-	private String startTime;
-	private Integer maximumPlayers;
+	String categoryKey;
+	String activity;
+	String description;
+	String startTime;
+	Integer maximumPlayers;
 }

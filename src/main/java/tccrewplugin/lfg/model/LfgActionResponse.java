@@ -3,24 +3,20 @@ package tccrewplugin.lfg.model;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class LfgActionResponse
 {
 	@SerializedName("success")
-	private boolean success;
+	boolean success;
 	@SerializedName("message")
-	private String message;
+	String message;
 	@SerializedName("group")
-	private JsonElement group;
+	JsonElement group;
 	@SerializedName("error")
-	private JsonElement error;
+	JsonElement error;
 
 	public String getErrorMessage()
 	{

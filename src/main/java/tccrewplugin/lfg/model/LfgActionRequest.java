@@ -1,15 +1,11 @@
 package tccrewplugin.lfg.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class LfgActionRequest
 {
-	private String action;
-	private String groupId;
-	private String idempotencyKey;
+	String action;
+	String groupId;
+	String idempotencyKey;
 }

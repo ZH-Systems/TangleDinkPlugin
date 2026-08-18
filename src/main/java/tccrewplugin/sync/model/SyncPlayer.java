@@ -1,10 +1,10 @@
 package tccrewplugin.sync.model;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class SyncPlayer
 {
-    private final String displayName;
-    private final SyncAccountType accountType;
+	String displayName;
+	SyncAccountType accountType;
 }

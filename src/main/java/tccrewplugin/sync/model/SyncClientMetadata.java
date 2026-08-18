@@ -1,10 +1,10 @@
 package tccrewplugin.sync.model;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class SyncClientMetadata
 {
-    private final String runeliteVersion;
-    private final String pluginVersion;
+	String runeliteVersion;
+	String pluginVersion;
 }

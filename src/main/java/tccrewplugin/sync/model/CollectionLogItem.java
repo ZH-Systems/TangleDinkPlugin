@@ -1,14 +1,14 @@
 package tccrewplugin.sync.model;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class CollectionLogItem
 {
-    private final Integer itemId;
-    private final String itemName;
-    private final int quantity;
-    private final boolean obtained;
-    private final String category;
-    private final String subcategory;
+	Integer itemId;
+	String itemName;
+	int quantity;
+	boolean obtained;
+	String category;
+	String subcategory;
 }

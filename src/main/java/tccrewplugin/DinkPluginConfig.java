@@ -1,31 +1,13 @@
 package tccrewplugin;
 
-import tccrewplugin.domain.AccountType;
-import tccrewplugin.domain.AchievementDiary;
-import tccrewplugin.domain.ChatNotificationType;
-import tccrewplugin.domain.ChatPrivacyMode;
-import tccrewplugin.domain.ClueTier;
-import tccrewplugin.domain.CombatAchievementTier;
-import tccrewplugin.domain.ConfigImportPolicy;
-import tccrewplugin.domain.ExceptionalDeath;
-import tccrewplugin.domain.ExternalScreenshotPolicy;
-import tccrewplugin.domain.FilterMode;
-import tccrewplugin.domain.LeagueTaskDifficulty;
-import tccrewplugin.domain.PlayerLookupService;
-import tccrewplugin.domain.SeasonalPolicy;
+import tccrewplugin.domain.*;
 import tccrewplugin.notifiers.ChatNotifier;
 import tccrewplugin.util.Utils;
 import net.runelite.api.Experience;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
-import net.runelite.client.config.Range;
-import net.runelite.client.config.Units;
+import net.runelite.client.config.*;
 
 import java.awt.Color;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 @ConfigGroup(SettingsManager.CONFIG_GROUP)
 public interface DinkPluginConfig extends Config {

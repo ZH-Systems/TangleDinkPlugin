@@ -2,19 +2,15 @@ package tccrewplugin.lfg.model;
 
 import com.google.gson.*;
 import com.google.gson.annotations.JsonAdapter;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 @JsonAdapter(LfgApiError.Adapter.class)
 public class LfgApiError
 {
-	private String code;
-	private String message;
-	private String details;
+	String code;
+	String message;
+	String details;
 
 	public static final class Adapter implements JsonDeserializer<LfgApiError>
 	{

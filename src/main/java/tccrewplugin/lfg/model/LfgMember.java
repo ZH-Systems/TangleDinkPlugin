@@ -1,22 +1,18 @@
 package tccrewplugin.lfg.model;
 
 import com.google.gson.annotations.JsonAdapter;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 import tccrewplugin.util.InstantAdapter;
 
 import java.time.Instant;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class LfgMember
 {
-	private String playerId;
-	private String rsn;
-	private String discordUserId;
-	private LfgSource source;
+	String playerId;
+	String rsn;
+	String discordUserId;
+	LfgSource source;
 	@JsonAdapter(InstantAdapter.class)
-	private Instant joinedAt;
+	Instant joinedAt;
 }
