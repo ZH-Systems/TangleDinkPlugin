@@ -13,7 +13,6 @@ public class SettingsPanel extends JPanel
 	private final TangleDinkConfig config;
 	private final LabeledValue apiBaseUrl = new LabeledValue("API Base URL");
 	private final LabeledValue syncInterval = new LabeledValue("Sync Interval");
-	private final LabeledValue webhookEnabled = new LabeledValue("Clan Webhooks");
 
 	public SettingsPanel(TangleDinkConfig config)
 	{
@@ -22,7 +21,6 @@ public class SettingsPanel extends JPanel
 		setBorder(BorderFactory.createTitledBorder("Plugin Settings"));
 		add(apiBaseUrl);
 		add(syncInterval);
-		add(webhookEnabled);
 	}
 
 	public void refresh()
@@ -30,7 +28,7 @@ public class SettingsPanel extends JPanel
 		SwingUtilities.invokeLater(() -> {
 			apiBaseUrl.setValue(config.apiBaseUrl());
 			syncInterval.setValue(Integer.toString(config.syncIntervalSeconds()));
-			webhookEnabled.setValue(Boolean.toString(config.clanWebhookEnabled()));
+			// clan chat webhook controls are hidden for the initial PR
 		});
 	}
 }

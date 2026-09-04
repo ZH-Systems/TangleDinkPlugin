@@ -13,7 +13,6 @@ import java.util.Set;
 
 import tccrewplugin.features.account.AccountFeature;
 import tccrewplugin.features.collectionlog.CollectionLogFeature;
-import tccrewplugin.features.clanchat.ClanChatFeature;
 import tccrewplugin.features.settings.SettingsFeature;
 import tccrewplugin.features.synchronization.SynchronizationFeature;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -31,14 +30,12 @@ public class FeatureManager
 		AccountFeature accountFeature,
 		SynchronizationFeature synchronizationFeature,
 		CollectionLogFeature collectionLogFeature,
-		ClanChatFeature clanChatFeature,
 		SettingsFeature settingsFeature
 	)
 	{
 		register(accountFeature);
 		register(synchronizationFeature);
 		register(collectionLogFeature);
-		register(clanChatFeature);
 		register(settingsFeature);
 		startupOrder.sort(Comparator.comparingInt(feature -> feature.getCategory().getOrder()));
 	}

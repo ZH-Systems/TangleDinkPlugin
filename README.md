@@ -1,10 +1,9 @@
 # Tangle Dink Plugin 
 
-Tangle Dink Plugin combines three workflows in one RuneLite sidebar entry:
+Tangle Dink Plugin combines two workflows in one RuneLite sidebar entry:
 
 1. Player-data synchronization against a remote API
-2. Clan chat webhook forwarding to a configurable endpoint
-3. Looking For Group synchronization against a Supabase backend
+2. Looking For Group synchronization against a Supabase backend
 
 It also includes a modular sidebar with collapsible feature folders so the plugin can grow without turning the main panel into a hard-coded list of special cases.
 
@@ -13,7 +12,6 @@ It also includes a modular sidebar with collapsible feature folders so the plugi
 The active plugin exposes exactly four intended top-level config folders:
 
 - `Event Drop Detection`
-- `Clan Chat Webhook`
 - `Clog/PB Sync`
 - `LFG Settings`
 
@@ -25,7 +23,6 @@ The plugin is split into:
 
 - `api/` for HTTP clients and shared request execution
 - `sync/` for manifest loading, snapshot capture, delta calculation, retry state, and submission
-- `clanchat/` for clan message classification, filtering, queueing, and webhook delivery
 - `collectionlog/` for the explicit collection-log capture flow and item mapping
 - `features/` for sidebar feature modules and their panels
 - `ui/` for the main sidebar panel and navigation
@@ -36,103 +33,11 @@ The main plugin stays small. It starts and stops the top-level services, wires R
 
 Add a new feature module under `src/main/java/tccrewplugin/features/...`, implement `PluginFeature`, and register it in `FeatureManager`. The sidebar navigation is data-driven from the registry, so the navigation UI does not need a new branch for each feature.
 
-## Clan Chat Webhooks
-
-The plugin now includes a client-side clan chat webhook sender.
-
-It listens to RuneLite clan chat events, sanitizes RuneLite markup, classifies clan system messages, detects account type badges, and sends a structured multipart request to your webhook endpoint.
-
-### Configuration
-
-These settings live in the `Clan Chat Webhook` config section:
-
-- `Secret Key`
-- `Endpoint URL`
-- `Clan Name`
-- `Send Normal Clan Chat`
-- `Send System Broadcasts`
-- `Send Unknown Broadcasts`
-- `Send Login Guidance`
-- `Debug Logging`
-- `Request Timeout`
-- `Include Client Metadata`
-
-The endpoint should normally be the base server URL, for example:
-
-`https://example.com`
-
-The plugin appends:
-
-`/webhook/{secretKey}`
-
-### Request Format
-
-The plugin sends:
-
-`POST {endpoint}/webhook/{secretKey}`
-
-with `multipart/form-data` containing one field:
-
-- `data` - JSON-serialized clan message payload
-
-### Payload Example
-
-```json
-{
-  "author": "Example Player",
-  "content": "Example Player received a new collection log item: Dragon defender",
-  "accountType": "IRON",
-  "systemMessageType": "COLLECTION_LOG",
-  "timestamp": 1775160000,
-  "clanTitle": null
-}
-```
-
-### Message Coverage
-
-The webhook sender supports:
-
-- normal clan chat
-- clan system messages
-- drops
-- raid drops
-- pet drops
-- collection-log entries
-- personal bests
-- quests
-- PvP broadcasts
-- membership events
-- level-ups
-- combat achievements
-- clue drops
-- achievement diaries
-- unknown clan broadcasts
-
-### Troubleshooting
-
-- Make sure the secret key is set
-- Make sure the endpoint URL is valid
-- Prefer `https`
-- If you are testing locally, `http://localhost` is allowed
-- Check `Debug Logging` for safe diagnostics
-- If a clan name filter is set, it must match the active clan exactly after whitespace normalization
-
-### Security Notes
-
-- The secret is never logged
-- HTTP requests are asynchronous
-- Requests have a timeout
-- Retry handling is bounded
-- Duplicate clan messages are suppressed for a short window
-- The plugin does not send messages when the endpoint is malformed
-
-### Local Testing
-
-1. Start a local webhook receiver.
-2. Set `Endpoint URL` to `http://localhost:<port>` or your HTTPS server base URL.
-3. Set `Secret Key` to the token your receiver expects.
-4. Enable the clan chat options you want to test.
-5. Log into RuneLite and send a clan message or trigger a clan broadcast.
+<!--
+Clan chat webhook forwarding is temporarily disabled for the initial PR.
+The implementation is still present in the source tree and can be restored
+from version control once the main review passes.
+-->
 
 ## Clog/PB Sync
 
@@ -422,6 +327,7 @@ Example submission:
 
 The plugin keeps the last successful snapshot per username and profile type, and only submits deltas.
 
+<!--
 ## Configuring Clan Webhooks
 
 Clan chat forwarding uses:
@@ -431,6 +337,7 @@ POST {clanWebhookEndpoint}
 Content-Type: application/json
 Authorization: Bearer {clanWebhookSecret}
 ```
+-->
 
 ## Event Drop Detection Workflow
 
@@ -438,6 +345,7 @@ The plugin now uses one `Event Drop Detection` settings section for the full con
 
 That section contains the webhook URLs, event state, remote event polling, notifier toggles, and all related notifier options. While a clan event is active, the clan-event webhook overrides all other webhook URLs.
 
+<!--
 - Clan webhooks are enabled
 - Endpoint and secret are present
 - The player is logged in
@@ -446,6 +354,7 @@ That section contains the webhook URLs, event state, remote event polling, notif
 - Guest broadcasts are allowed when the message is guest-related
 - The message is not a duplicate
 - The message is not plugin-generated loopback text
+-->
 
 ### Remote Event Commands
 

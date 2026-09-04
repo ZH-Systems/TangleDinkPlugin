@@ -33,10 +33,8 @@ public class MainPanel extends PluginPanel
 	private final LabeledValue profileType = new LabeledValue("Profile");
 	private final LabeledValue clanName = new LabeledValue("Clan");
 	private final LabeledValue lastSync = new LabeledValue("Last Player Sync");
-	private final LabeledValue lastWebhook = new LabeledValue("Last Webhook");
 	private final LabeledValue manifestVersion = new LabeledValue("Manifest");
 	private final LabeledValue pendingChanges = new LabeledValue("Pending Changes");
-	private final LabeledValue pendingQueue = new LabeledValue("Queue Size");
 
 	public MainPanel(PlayerSyncService playerSyncService, ClanChatService clanChatService, FeatureManager featureManager)
 	{
@@ -69,20 +67,15 @@ public class MainPanel extends PluginPanel
 		header.add(profileType);
 		header.add(clanName);
 		header.add(lastSync);
-		header.add(lastWebhook);
 		header.add(manifestVersion);
 		header.add(pendingChanges);
-		header.add(pendingQueue);
 		JPanel actions = new JPanel();
 		JButton syncButton = new JButton("Manual Sync");
 		syncButton.addActionListener(e -> playerSyncService.requestSync());
 		JButton reloadButton = new JButton("Reload Manifest");
 		reloadButton.addActionListener(e -> playerSyncService.reloadManifest());
-		JButton testButton = new JButton("Test Webhook");
-		testButton.addActionListener(e -> clanChatService.enqueueTestWebhook());
 		actions.add(syncButton);
 		actions.add(reloadButton);
-		actions.add(testButton);
 		header.add(actions);
 		return header;
 	}
@@ -104,24 +97,14 @@ public class MainPanel extends PluginPanel
 			profileType.setValue(playerSyncService.getCurrentProfileType());
 			clanName.setValue(clanChatService.getCurrentClanName());
 			lastSync.setValue(TimeFormatter.formatInstant(playerSyncService.getLastSuccessfulSync()));
-			lastWebhook.setValue(TimeFormatter.formatInstant(clanChatService.getLastSuccessfulDelivery()));
 			manifestVersion.setValue(playerSyncService.getManifestVersionValue() == null ? "-" : String.valueOf(playerSyncService.getManifestVersionValue()));
 			pendingChanges.setValue(String.valueOf(status.getPendingFieldCount()));
-			pendingQueue.setValue(String.valueOf(clanChatService.getQueueSize()));
 			StringBuilder errors = new StringBuilder();
 			if (status.getSanitizedError() != null && !status.getSanitizedError().isEmpty())
 			{
 				errors.append(status.getSanitizedError());
 			}
-			String clanError = clanChatService.getLastError();
-			if (clanError != null && !clanError.isEmpty())
-			{
-				if (errors.length() > 0)
-				{
-					errors.append('\n');
-				}
-				errors.append(clanError);
-			}
+			// clan chat webhook status is hidden for the initial PR
 			errorPanel.setMessage(errors.toString());
 			navigationPanel.refresh();
 		});

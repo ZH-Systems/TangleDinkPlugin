@@ -104,7 +104,8 @@ public interface DinkPluginConfig extends Config {
         name = "Secret Key",
         description = "The secret key used to authenticate webhook requests.",
         position = 0,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default String secretKey()
     {
@@ -116,7 +117,8 @@ public interface DinkPluginConfig extends Config {
         name = "Endpoint URL",
         description = "The server endpoint where clan chat events are sent.",
         position = 1,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default String webhookEndpoint()
     {
@@ -128,7 +130,8 @@ public interface DinkPluginConfig extends Config {
         name = "Clan Name",
         description = "Optional clan name filter. Messages from other clans will not be sent.",
         position = 2,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default String clanName()
     {
@@ -140,7 +143,8 @@ public interface DinkPluginConfig extends Config {
         name = "Send Normal Clan Chat",
         description = "Controls whether player-written clan messages are transmitted.",
         position = 3,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean sendNormalChat()
     {
@@ -152,7 +156,8 @@ public interface DinkPluginConfig extends Config {
         name = "Send System Broadcasts",
         description = "Controls whether clan system broadcasts are transmitted.",
         position = 4,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean sendSystemBroadcasts()
     {
@@ -164,7 +169,8 @@ public interface DinkPluginConfig extends Config {
         name = "Send Unknown Broadcasts",
         description = "Unknown system broadcasts are retained because RuneScape message formats can change.",
         position = 5,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean sendUnknownBroadcasts()
     {
@@ -176,7 +182,8 @@ public interface DinkPluginConfig extends Config {
         name = "Send Login Guidance",
         description = "Controls whether instructional clan login guidance messages are transmitted.",
         position = 6,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean sendLoginGuidance()
     {
@@ -188,7 +195,8 @@ public interface DinkPluginConfig extends Config {
         name = "Debug Logging",
         description = "When enabled, log safe diagnostic information.",
         position = 7,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean debugLogging()
     {
@@ -200,7 +208,8 @@ public interface DinkPluginConfig extends Config {
         name = "Request Timeout",
         description = "The timeout used for clan webhook HTTP requests.",
         position = 8,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     @Units(Units.SECONDS)
     default int requestTimeoutSeconds()
@@ -213,7 +222,8 @@ public interface DinkPluginConfig extends Config {
         name = "Include Client Metadata",
         description = "Allows the payload to include plugin and RuneLite metadata.",
         position = 9,
-        section = clanChatWebhookSection
+        section = clanChatWebhookSection,
+        hidden = true
     )
     default boolean includeClientMetadata()
     {

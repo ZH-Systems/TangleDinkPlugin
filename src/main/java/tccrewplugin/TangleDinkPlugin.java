@@ -15,7 +15,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import tccrewplugin.collectionlog.CollectionLogConstants;
 import tccrewplugin.collectionlog.CollectionLogService;
-import tccrewplugin.clanchat.ClanChatService;
 import tccrewplugin.features.FeatureManager;
 import tccrewplugin.sync.PlayerSyncService;
 import tccrewplugin.ui.MainPanel;
@@ -26,8 +25,8 @@ import javax.inject.Inject;
 @Slf4j
 @PluginDescriptor(
 	name = PluginConstants.PLUGIN_NAME,
-	description = "Player sync and clan webhook plugin",
-	tags = { "sync", "clan", "webhook", "collection log" }
+	description = "Player sync and collection log plugin",
+	tags = { "sync", "collection log" }
 )
 public class TangleDinkPlugin extends Plugin
 {
@@ -37,8 +36,6 @@ public class TangleDinkPlugin extends Plugin
 	private PlayerSyncService playerSyncService;
 	@Inject
 	private CollectionLogService collectionLogService;
-	@Inject
-	private ClanChatService clanChatService;
 	@Inject
 	private MainPanel mainPanel;
 	@Inject
@@ -53,7 +50,6 @@ public class TangleDinkPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		clanChatService.startUp();
 		playerSyncService.startUp();
 		featureManager.startUp();
 		sidebarNavigationManager.addNavigationButton();
@@ -65,7 +61,6 @@ public class TangleDinkPlugin extends Plugin
 	{
 		sidebarNavigationManager.removeNavigationButton();
 		collectionLogService.stopCapture();
-		clanChatService.shutDown();
 		playerSyncService.shutDown();
 		featureManager.shutDown();
 	}
@@ -79,7 +74,6 @@ public class TangleDinkPlugin extends Plugin
 		}
 
 		playerSyncService.onConfigChanged(event.getKey());
-		clanChatService.onConfigChanged(event.getKey());
 		featureManager.refresh();
 		mainPanel.refresh();
 	}
@@ -89,7 +83,6 @@ public class TangleDinkPlugin extends Plugin
 	{
 		GameState gameState = event.getGameState();
 		playerSyncService.onGameStateChanged(gameState);
-		clanChatService.onGameStateChanged(gameState);
 		collectionLogService.resetForAccountChange();
 		mainPanel.refresh();
 	}
@@ -106,25 +99,13 @@ public class TangleDinkPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
-		String typeName = event.getType() == null ? null : event.getType().name();
-		String sender = event.getName();
-		String senderRank = event.getSender();
-		String message = event.getMessage();
-		boolean guest = typeName != null && typeName.toUpperCase().contains("GUEST");
-		boolean plausible = typeName != null && (typeName.toUpperCase().contains("CLAN") || typeName.toUpperCase().contains("BROADCAST") || typeName.toUpperCase().contains("GUEST"));
-		if (plausible)
-		{
-			clanChatService.onChatMessage(typeName, sender, senderRank, message, guest);
-		}
+		// clan chat webhook relay disabled for the initial PR
 	}
 
 	@Subscribe
 	public void onClanChannelChanged(net.runelite.api.events.ClanChannelChanged event)
 	{
-		if (event.getClanChannel() != null)
-		{
-			clanChatService.onClanChannelChanged(event.getClanChannel());
-		}
+		// clan chat webhook relay disabled for the initial PR
 	}
 
 	@Subscribe

@@ -1,7 +1,6 @@
 package tccrewplugin;
 
 import com.google.inject.Provides;
-import tccrewplugin.clanchat.ClanChatWebhookManager;
 import tccrewplugin.lfg.LfgNavigationManager;
 import tccrewplugin.lfg.LfgPanel;
 import tccrewplugin.lfg.LfgService;
@@ -83,9 +82,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 @PluginDescriptor(
     name = "Tangle Crew Plugin",
-    description = "Discord-compatible webhook notifications for Loot, Death, Levels, CLog, KC, Diary, Quests, and clan chat.",
+    description = "Discord-compatible webhook notifications for Loot, Death, Levels, CLog, KC, Diary, and Quests.",
     tags = { "loot", "logger", "collection", "pet", "death", "xp", "level", "notifications", "discord", "speedrun",
-        "diary", "combat achievements", "combat task", "barbarian assault", "high level gambles", "clan chat", "webhook" }
+        "diary", "combat achievements", "combat task", "barbarian assault", "high level gambles", "webhook" }
 )
 public class TcCrewPlugin extends Plugin {
     public static final String USER_AGENT = RuneLite.USER_AGENT + " (TcCrew/1.x)";
@@ -95,7 +94,6 @@ public class TcCrewPlugin extends Plugin {
     private @Inject DinkPluginConfig config;
     private @Inject SettingsManager settingsManager;
     private @Inject ClanEventManager clanEventManager;
-    private @Inject ClanChatWebhookManager clanChatWebhookManager;
     private @Inject LfgService lfgService;
     @com.google.inject.Inject(optional = true)
     private Provider<ClientToolbar> clientToolbarProvider;
@@ -154,7 +152,6 @@ public class TcCrewPlugin extends Plugin {
         log.debug("Started up Dink");
         settingsManager.init();
         clanEventManager.init();
-        clanChatWebhookManager.startUp();
         lfgService.attachPanel(lfgPanel);
         if (lfgNavigationManager == null && clientToolbarProvider != null)
         {
@@ -188,7 +185,6 @@ public class TcCrewPlugin extends Plugin {
             lfgNavigationManager.shutDown();
         }
         lfgService.shutDown();
-        clanChatWebhookManager.shutDown();
         clogPbSyncManager.shutdown();
         remoteEventManager.shutDown();
         gameState.lazySet(null);
@@ -245,7 +241,6 @@ public class TcCrewPlugin extends Plugin {
 
         settingsManager.onConfigChanged(event);
         clanEventManager.onConfigChanged(event.getKey());
-        clanChatWebhookManager.onConfigChanged(event.getKey());
         lfgService.onConfigChanged(event);
         if (lfgNavigationManager != null) {
             lfgNavigationManager.onConfigChanged(event);
@@ -323,7 +318,6 @@ public class TcCrewPlugin extends Plugin {
     @Subscribe(priority = 1) // run before the base loot tracker plugin
     public void onChatMessage(ChatMessage message) {
         clogPbSyncManager.onChatMessage(message);
-        clanChatWebhookManager.onChatMessage(message);
         String chatMessage = Utils.sanitize(message.getMessage());
         String source = message.getName() != null && !message.getName().isEmpty() ? message.getName() : message.getSender();
         chatNotifier.onMessage(message.getType(), source, chatMessage);
@@ -379,7 +373,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Subscribe
     public void onClanChannelChanged(ClanChannelChanged event) {
-        clanChatWebhookManager.onClanChannelChanged(event);
+        // clan chat webhook relay disabled for the initial PR
     }
 
     @Subscribe
