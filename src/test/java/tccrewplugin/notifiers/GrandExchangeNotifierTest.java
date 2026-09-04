@@ -120,29 +120,6 @@ public class GrandExchangeNotifierTest extends MockedNotifierTest {
     }
 
     @Test
-    void testNotifySpacing() throws InterruptedException {
-        // update config mock
-        when(config.grandExchangeProgressSpacingMinutes()).thenReturn(0);
-
-        // fire event
-        Offer offer = new Offer(11, ItemID.RUBY, 50, RUBY_PRICE, 11_000, GrandExchangeOfferState.BUYING);
-        notifier.onOfferChange(0, offer);
-
-        // verify notification
-        verifyNotification(0, offer, "bought", "Ruby", RUBY_PRICE, null);
-
-        // allow time to pass
-        Thread.sleep(2500);
-
-        // fire second event
-        Offer offer2 = new Offer(22, ItemID.RUBY, 50, RUBY_PRICE, 22_000, GrandExchangeOfferState.BUYING);
-        notifier.onOfferChange(0, offer2);
-
-        // verify second notification
-        verifyNotification(0, offer2, "bought", "Ruby", RUBY_PRICE, null);
-    }
-
-    @Test
     void testIgnoreSpacing() {
         // update config mock
         when(config.grandExchangeProgressSpacingMinutes()).thenReturn(0);

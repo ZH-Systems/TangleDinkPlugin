@@ -237,7 +237,6 @@ class RarityServiceTest extends AbstractRarityServiceTest {
     @Test
     @DisplayName("Ensure monster name excludes any parenthetical suffix from the wiki")
     void testSuffix() {
-        // RarityCalculator removes wiki's (monster) suffix: https://oldschool.runescape.wiki/w/TzHaar-Mej_(monster)
         test("TzHaar-Mej", ItemID.TZHAAR_CAPE_OBSIDIAN, 1, 1.0 / 4_096);
     }
 

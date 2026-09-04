@@ -46,27 +46,17 @@ public class ApiRequestExecutor
 				try (ResponseBody body = response.body())
 				{
 					String bodyText = body == null ? "" : body.string();
-					if (log.isDebugEnabled() && response.request() != null && response.request().url() != null)
+					if (log.isDebugEnabled())
 					{
-						String encodedPath = response.request().url().encodedPath();
+						Request responseRequest = response.request();
+						String encodedPath = responseRequest.url().encodedPath();
 						if (encodedPath.startsWith("/functions/v1/lfg-"))
 						{
-							log.debug("LFG request completed: method={}, url={}, status={}", response.request().method(), response.request().url(), response.code());
+							log.debug("LFG request completed: method={}, url={}, status={}", responseRequest.method(), responseRequest.url(), response.code());
 							log.debug("LFG response body: bytes={}, body={}", bodyText.length(), sanitizeBody(bodyText));
 						}
 					}
-					T parsed = null;
-					if (!bodyText.isEmpty() && responseType != null)
-					{
-						if (String.class.equals(responseType))
-						{
-							parsed = (T) bodyText;
-						}
-						else
-						{
-							parsed = gson.fromJson(bodyText, responseType);
-						}
-					}
+					T parsed = bodyText.isEmpty() || responseType == null ? null : String.class.equals(responseType) ? (T) bodyText : gson.fromJson(bodyText, responseType);
 					future.complete(new ApiResult<>(response.code(), parsed, response.isSuccessful() ? null : sanitizeBody(bodyText)));
 				}
 				catch (Exception ex)
@@ -90,20 +80,12 @@ public class ApiRequestExecutor
 
 	private static String sanitizeBody(String body)
 	{
-		if (body == null || body.isEmpty())
-		{
-			return "empty response";
-		}
-		return body.length() > 512 ? body.substring(0, 512) + "…" : body;
+		return body == null || body.isEmpty() ? "empty response" : body.length() > 512 ? body.substring(0, 512) + "..." : body;
 	}
 
 	private static String sanitizeError(Throwable error)
 	{
 		String message = error == null ? "unknown error" : error.getMessage();
-		if (message == null || message.isEmpty())
-		{
-			return "unknown error";
-		}
-		return message.length() > 256 ? message.substring(0, 256) + "…" : message;
+		return message == null || message.isEmpty() ? "unknown error" : message.length() > 256 ? message.substring(0, 256) + "..." : message;
 	}
 }

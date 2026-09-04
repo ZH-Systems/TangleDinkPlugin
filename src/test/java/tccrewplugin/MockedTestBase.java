@@ -12,7 +12,7 @@ public abstract class MockedTestBase {
 
     @BeforeEach
     protected void setUp() {
-        this.mocks = MockitoAnnotations.openMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
     }
 
@@ -20,6 +20,5 @@ public abstract class MockedTestBase {
     protected void cleanUp() throws Exception {
         mocks.close();
     }
-
 }
 

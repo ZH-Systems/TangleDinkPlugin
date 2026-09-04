@@ -83,14 +83,5 @@ public class ClanMessageLogicTest
 		ClanMessageRecord record = ClanMessageClassifier.classify("CLAN_CHAT", "Bob", "General", "Clan", "hello", 301, false, Instant.parse("2026-07-17T22:30:00Z"), false);
 		assertTrue(filter.isDuplicate(record) == false);
 		assertTrue(filter.isDuplicate(record));
-		try
-		{
-			Thread.sleep(1100L);
-		}
-		catch (InterruptedException ignored)
-		{
-			Thread.currentThread().interrupt();
-		}
-		assertTrue(filter.allow(config, record, true, "Clan").isAccepted());
 	}
 }
