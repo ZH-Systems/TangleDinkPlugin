@@ -380,7 +380,7 @@ Player sync uses:
 - `GET {apiBaseUrl}/api/sync/manifest`
 - `POST {apiBaseUrl}/api/sync/submit`
 
-The API token is sent as a bearer token. Keep the default `apiBaseUrl` as a development placeholder until you point it at a real service.
+The API token is sent as a bearer token.  Keep the default `apiBaseUrl` as a development placeholder until you point it at a real service.
 
 Example manifest:
 
