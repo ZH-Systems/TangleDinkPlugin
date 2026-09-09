@@ -1,7 +1,6 @@
 package tccrewplugin.features.account;
 
 import tccrewplugin.TangleDinkConfig;
-import tccrewplugin.clanchat.ClanChatService;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 import tccrewplugin.sync.PlayerSyncService;
@@ -15,10 +14,10 @@ public class AccountFeature implements PluginFeature
 	private final AccountPanel panel;
 
 	@Inject
-	public AccountFeature(TangleDinkConfig config, PlayerSyncService playerSyncService, ClanChatService clanChatService)
+	public AccountFeature(TangleDinkConfig config, PlayerSyncService playerSyncService)
 	{
 		this.config = config;
-		this.panel = new AccountPanel(playerSyncService, clanChatService);
+		this.panel = new AccountPanel(playerSyncService);
 	}
 
 	@Override

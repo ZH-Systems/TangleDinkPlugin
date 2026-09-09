@@ -381,11 +381,12 @@ public interface DinkPluginConfig extends Config {
         name = "Enable Looking For Group",
         description = "Enables the Tangle Crew Looking For Group sidebar and synchronization.",
         position = 0,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgEnabled()
     {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -393,7 +394,8 @@ public interface DinkPluginConfig extends Config {
         name = "Supabase URL",
         description = "Base URL for the Supabase project hosting the Looking For Group backend. Use the project origin, not a function path.",
         position = 1,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default String lfgSupabaseUrl()
     {
@@ -406,7 +408,8 @@ public interface DinkPluginConfig extends Config {
         description = "Restricted token used to authenticate Looking For Group requests.",
         position = 2,
         section = lfgSection,
-        secret = true
+        secret = true,
+        hidden = true
     )
     default String lfgApiToken()
     {
@@ -418,7 +421,8 @@ public interface DinkPluginConfig extends Config {
         name = "Visible Categories",
         description = "Comma-separated category keys shown in the RuneLite sidebar. Leave blank to show all enabled categories.",
         position = 3,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default String lfgVisibleCategories()
     {
@@ -430,7 +434,8 @@ public interface DinkPluginConfig extends Config {
         name = "Refresh Interval",
         description = "How often active groups are refreshed while the LFG sidebar is open.",
         position = 4,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     @Range(min = 10, max = 300)
     @Units(Units.SECONDS)
@@ -444,7 +449,8 @@ public interface DinkPluginConfig extends Config {
         name = "Show Chat Messages",
         description = "Shows local RuneLite chat messages for LFG actions, synchronization results, and errors.",
         position = 6,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgShowChatMessages()
     {
@@ -456,7 +462,8 @@ public interface DinkPluginConfig extends Config {
         name = "Show Full Groups",
         description = "Shows full groups in the active group list.",
         position = 7,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgShowFullGroups()
     {
@@ -468,7 +475,8 @@ public interface DinkPluginConfig extends Config {
         name = "Show Discord Groups",
         description = "Shows groups created from Discord in the RuneLite sidebar.",
         position = 8,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgShowDiscordGroups()
     {
@@ -480,7 +488,8 @@ public interface DinkPluginConfig extends Config {
         name = "Show RuneLite Groups",
         description = "Shows groups created from RuneLite in the sidebar.",
         position = 9,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgShowRuneLiteGroups()
     {
@@ -492,7 +501,8 @@ public interface DinkPluginConfig extends Config {
         name = "Debug Logging",
         description = "Writes non-sensitive Looking For Group diagnostics to the plugin log.",
         position = 10,
-        section = lfgSection
+        section = lfgSection,
+        hidden = true
     )
     default boolean lfgDebugLogging()
     {

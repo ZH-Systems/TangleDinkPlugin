@@ -2,7 +2,6 @@ package tccrewplugin.ui;
 
 import net.runelite.client.ui.PluginPanel;
 import tccrewplugin.PluginConstants;
-import tccrewplugin.clanchat.ClanChatService;
 import tccrewplugin.features.FeatureManager;
 import tccrewplugin.sync.PlayerSyncService;
 import tccrewplugin.sync.SyncStatusModel;
@@ -23,7 +22,6 @@ import java.awt.Component;
 public class MainPanel extends PluginPanel
 {
 	private final PlayerSyncService playerSyncService;
-	private final ClanChatService clanChatService;
 	private final FeatureManager featureManager;
 	private final FeatureNavigationPanel navigationPanel;
 	private final FeatureContentPanel contentPanel = new FeatureContentPanel();
@@ -31,15 +29,13 @@ public class MainPanel extends PluginPanel
 	private final StatusCard connectionState = new StatusCard("Connection");
 	private final LabeledValue playerName = new LabeledValue("Player");
 	private final LabeledValue profileType = new LabeledValue("Profile");
-	private final LabeledValue clanName = new LabeledValue("Clan");
 	private final LabeledValue lastSync = new LabeledValue("Last Player Sync");
 	private final LabeledValue manifestVersion = new LabeledValue("Manifest");
 	private final LabeledValue pendingChanges = new LabeledValue("Pending Changes");
 
-	public MainPanel(PlayerSyncService playerSyncService, ClanChatService clanChatService, FeatureManager featureManager)
+	public MainPanel(PlayerSyncService playerSyncService, FeatureManager featureManager)
 	{
 		this.playerSyncService = playerSyncService;
-		this.clanChatService = clanChatService;
 		this.featureManager = featureManager;
 		this.navigationPanel = new FeatureNavigationPanel(featureManager, contentPanel::showFeature);
 		for (var feature : featureManager.getFeatures())
@@ -65,7 +61,6 @@ public class MainPanel extends PluginPanel
 		header.add(connectionState);
 		header.add(playerName);
 		header.add(profileType);
-		header.add(clanName);
 		header.add(lastSync);
 		header.add(manifestVersion);
 		header.add(pendingChanges);
@@ -95,7 +90,6 @@ public class MainPanel extends PluginPanel
 			connectionState.setValue(status.getStatus().name());
 			playerName.setValue(playerSyncService.getCurrentUsername());
 			profileType.setValue(playerSyncService.getCurrentProfileType());
-			clanName.setValue(clanChatService.getCurrentClanName());
 			lastSync.setValue(TimeFormatter.formatInstant(playerSyncService.getLastSuccessfulSync()));
 			manifestVersion.setValue(playerSyncService.getManifestVersionValue() == null ? "-" : String.valueOf(playerSyncService.getManifestVersionValue()));
 			pendingChanges.setValue(String.valueOf(status.getPendingFieldCount()));

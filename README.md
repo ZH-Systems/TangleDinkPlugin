@@ -1,9 +1,8 @@
 # Tangle Dink Plugin 
 
-Tangle Dink Plugin combines two workflows in one RuneLite sidebar entry:
+Tangle Dink Plugin currently focuses on one sync workflow in one RuneLite sidebar entry:
 
 1. Player-data synchronization against a remote API
-2. Looking For Group synchronization against a Supabase backend
 
 It also includes a modular sidebar with collapsible feature folders so the plugin can grow without turning the main panel into a hard-coded list of special cases.
 
@@ -13,9 +12,8 @@ The active plugin exposes exactly four intended top-level config folders:
 
 - `Event Drop Detection`
 - `Clog/PB Sync`
-- `LFG Settings`
 
-Existing settings stay in their current section. The new LFG settings live only under `LFG Settings`.
+Existing settings stay in their current section.
 
 ## Architecture
 
@@ -26,6 +24,8 @@ The plugin is split into:
 - `collectionlog/` for the explicit collection-log capture flow and item mapping
 - `features/` for sidebar feature modules and their panels
 - `ui/` for the main sidebar panel and navigation
+
+Disabled feature implementations are parked under `disabled-src/main/java`. Gradle does not compile that folder. To restore one, move the package back under `src/main/java` and uncomment the matching plugin wiring.
 
 The main plugin stays small. It starts and stops the top-level services, wires RuneLite events to the relevant service methods, and adds the single sidebar button.
 
@@ -39,15 +39,23 @@ The implementation is still present in the source tree and can be restored
 from version control once the main review passes.
 -->
 
+<!--
+Looking For Group synchronization is temporarily disabled for the initial PR.
+The implementation is still present in the source tree and can be restored
+from version control once the main review passes.
+-->
+
 ## Clog/PB Sync
 
 The plugin also includes a client-side collection-log and personal-best sync path.
 
+<!--
 ## LFG Integration
 
 The LFG panel now expects its category and activity catalog to come from the shared Supabase backend. In the intended setup, the Discord bot syncs its `roleMenu.js` definitions into Supabase, so RuneLite shows the same categories and activities that Discord uses for `/lfg-roles` and `/lfg-post`.
 
 Groups created from RuneLite still go through the same Supabase LFG endpoints, and the existing Discord delivery worker can publish RuneLite-created groups into Discord. Discord-created forum groups can also be mirrored back into the same backend, which lets the plugin browse groups that originated in Discord instead of only local RuneLite-created rows.
+-->
 
 It reads locally available collection-log state, reads the same personal-best values RuneLite stores for `!pb`, and sends versioned JSON to a webhook you configure.
 
@@ -182,6 +190,7 @@ What to verify:
 - `!clogstatus` reports the sync cache state without sending a request
 - `!clogsync` sends only collection-log data
 
+<!--
 ## Looking For Group
 
 The plugin includes a RuneLite sidebar panel for Looking For Group coordination backed by Supabase.
@@ -274,6 +283,7 @@ Optional commands are routed locally:
 - The plugin does not parse Discord message text to infer group state.
 
 The separate backend implementation prompt is in [docs/LFG_SUPABASE_AGENT_PROMPT.md](docs/LFG_SUPABASE_AGENT_PROMPT.md).
+-->
 - `!pball` sends only local PB data
 - `!syncall` sends both sections together
 - the plugin does not upload anything when synchronization is disabled
