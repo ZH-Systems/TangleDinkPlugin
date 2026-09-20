@@ -2,8 +2,8 @@ package tccrewplugin;
 
 public final class PluginConstants
 {
-	public static final String PLUGIN_NAME = "Tangle Dink Plugin";
-	public static final String CONFIG_GROUP = "tangle-dink";
+	public static final String PLUGIN_NAME = "Tangle Crew Plugin";
+	public static final String CONFIG_GROUP = "tanglecrew";
 	public static final String VERSION = "1.0.0";
 
 	public static final String DEFAULT_API_BASE_URL = "https://dev.example.invalid";

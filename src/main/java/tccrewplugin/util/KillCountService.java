@@ -4,7 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 import tccrewplugin.notifiers.ClueNotifier;
 import tccrewplugin.notifiers.KillCountNotifier;
@@ -69,7 +69,7 @@ public class KillCountService {
     private ConfigManager configManager;
 
     @Inject
-    private DinkPluginConfig config;
+    private TangleCrewConfig config;
 
     @Inject
     private Client client;

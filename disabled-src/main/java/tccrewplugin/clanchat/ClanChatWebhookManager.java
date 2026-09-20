@@ -1,6 +1,6 @@
 package tccrewplugin.clanchat;
 
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.TcCrewPlugin;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -22,14 +22,14 @@ import java.util.UUID;
 public class ClanChatWebhookManager
 {
 	private final Client client;
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private final ClanWebhookService webhookService;
 	private final ClanMemberTitleResolver titleResolver;
 
 	private volatile boolean activeClan;
 
 	@Inject
-	public ClanChatWebhookManager(Client client, DinkPluginConfig config, ClanWebhookService webhookService, ClanMemberTitleResolver titleResolver)
+	public ClanChatWebhookManager(Client client, TangleCrewConfig config, ClanWebhookService webhookService, ClanMemberTitleResolver titleResolver)
 	{
 		this.client = client;
 		this.config = config;

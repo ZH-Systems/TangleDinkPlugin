@@ -46,7 +46,7 @@ public class RemoteEventManager {
     private final Gson gson;
     private final Client client;
     private final TcCrewPlugin plugin;
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final SettingsManager settingsManager;
     private final ScheduledExecutorService executor;
     private final OkHttpClient httpClient;
@@ -60,7 +60,7 @@ public class RemoteEventManager {
         Gson gson,
         Client client,
         TcCrewPlugin plugin,
-        DinkPluginConfig config,
+        TangleCrewConfig config,
         SettingsManager settingsManager,
         ScheduledExecutorService executor,
         OkHttpClient httpClient

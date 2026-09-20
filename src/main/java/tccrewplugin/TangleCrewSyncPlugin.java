@@ -28,7 +28,7 @@ import javax.inject.Inject;
 	description = "Player sync and collection log plugin",
 	tags = { "sync", "collection log" }
 )
-public class TangleDinkPlugin extends Plugin
+public class TangleCrewSyncPlugin extends Plugin
 {
 	@Inject
 	private FeatureManager featureManager;
@@ -42,9 +42,9 @@ public class TangleDinkPlugin extends Plugin
 	private SidebarNavigationManager sidebarNavigationManager;
 
 	@Provides
-	TangleDinkConfig provideConfig(ConfigManager configManager)
+	TangleCrewSyncConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(TangleDinkConfig.class);
+		return configManager.getConfig(TangleCrewSyncConfig.class);
 	}
 
 	@Override

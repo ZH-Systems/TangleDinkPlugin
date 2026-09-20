@@ -13,7 +13,7 @@ This repository is a fork/customization of the Dink RuneLite plugin. The request
 ## Current Repo State
 
 - Main plugin class: `src/main/java/TcCrewPlugin/tccrewplugin.java`
-- Config interface: `src/main/java/TcCrewPlugin/DinkPluginConfig.java`
+- Config interface: `src/main/java/TcCrewPlugin/TangleCrewConfig.java`
 - Runtime config/import manager: `src/main/java/TcCrewPlugin/SettingsManager.java`
 - Webhook routing for most notifiers: `src/main/java/TcCrewPlugin/notifiers/BaseNotifier.java`
 - Webhook HTTP + screenshot processing: `src/main/java/TcCrewPlugin/message/DiscordMessageHandler.java`
@@ -23,7 +23,7 @@ This repository is a fork/customization of the Dink RuneLite plugin. The request
 - Current modified file before this handoff was created: `settings.gradle.kts`, with `rootProject.name = "ClanEventDinkPlugin"`.
 - Implemented clan event files: `src/main/java/TcCrewPlugin/ClanEventManager.java` and `src/main/java/TcCrewPlugin/ClanEventOverlay.java`.
 
-There is no custom Dink panel class in the repo. The plugin uses RuneLite's generated config UI from `DinkPluginConfig` annotations, so "Dink panel" likely means the plugin config panel, not a custom Swing panel.
+There is no custom Dink panel class in the repo. The plugin uses RuneLite's generated config UI from `TangleCrewConfig` annotations, so "Dink panel" likely means the plugin config panel, not a custom Swing panel.
 
 ## Important Existing Behavior
 
@@ -45,7 +45,7 @@ Screenshot capture is centralized in `DiscordMessageHandler#captureScreenshot`, 
 
 ### 1. Clan Event Config
 
-Implemented in `DinkPluginConfig` with a new `Clan Event` section:
+Implemented in `TangleCrewConfig` with a new `Clan Event` section:
 
 - `clanEventEnabled` boolean, name like `Clan Event Active`.
 - `clanEventWebhook` string, name like `Clan Event Webhook URLs`.
@@ -66,7 +66,7 @@ Responsibilities:
 - Decide whether the clan event is active now.
 - Expose `String getActiveWebhookOverride()`.
 - Expose `String getOverlayText()` or separate `getSecretCode()`/`getDateText()`.
-- On each tick, if `clanEventEnabled` is true and the configured end time has passed, set `clanEventEnabled` to false through `DinkPluginConfig#setClanEventEnabled`.
+- On each tick, if `clanEventEnabled` is true and the configured end time has passed, set `clanEventEnabled` to false through `TangleCrewConfig#setClanEventEnabled`.
 - Add a chat warning/success through `TcCrewPlugin` when an event auto-ends.
 
 It is injected into `TcCrewPlugin`, initialized on startup, notified on config changes, and ticked from `TcCrewPlugin#onGameTick`.
@@ -95,7 +95,7 @@ Implemented as:
 Implementation notes:
 
 - Extend `net.runelite.client.ui.overlay.Overlay`.
-- Inject `DinkPluginConfig` or `ClanEventManager`.
+- Inject `TangleCrewConfig` or `ClanEventManager`.
 - Render only when the event is active and a secret code is non-blank.
 - Text should include the secret code and current date, for example `Code: ABC123 | 2026-06-06`.
 - Register/unregister it in `TcCrewPlugin` using `OverlayManager`.
@@ -109,7 +109,7 @@ Implemented in `DiscordMessageHandler#captureScreenshot` by stamping the clan ev
 
 ## Files To Touch
 
-- `src/main/java/TcCrewPlugin/DinkPluginConfig.java`
+- `src/main/java/TcCrewPlugin/TangleCrewConfig.java`
   - Add clan event config section and items.
 - `src/main/java/TcCrewPlugin/tccrewplugin.java`
   - Inject `ClanEventManager`, `ClanEventOverlay`, and `OverlayManager`.

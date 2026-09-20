@@ -19,7 +19,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import org.apache.commons.lang3.StringUtils;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 import tccrewplugin.sync.ClogPbSyncManager;
 
@@ -71,7 +71,7 @@ public class CollectionLogSyncButtonManager
 	private final Client client;
 	private final ClientThread clientThread;
 	private final EventBus eventBus;
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private final ClogPbSyncManager syncManager;
 	private final List<Widget> createdWidgets = new ArrayList<>();
 
@@ -86,7 +86,7 @@ public class CollectionLogSyncButtonManager
 		Client client,
 		ClientThread clientThread,
 		EventBus eventBus,
-		DinkPluginConfig config,
+		TangleCrewConfig config,
 		ClogPbSyncManager syncManager)
 	{
 		this.client = client;

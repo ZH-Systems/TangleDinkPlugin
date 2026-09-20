@@ -1,6 +1,6 @@
 package tccrewplugin.features.settings;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.ui.components.LabeledValue;
 
 import javax.swing.BorderFactory;
@@ -10,11 +10,11 @@ import javax.swing.SwingUtilities;
 
 public class SettingsPanel extends JPanel
 {
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final LabeledValue apiBaseUrl = new LabeledValue("API Base URL");
 	private final LabeledValue syncInterval = new LabeledValue("Sync Interval");
 
-	public SettingsPanel(TangleDinkConfig config)
+	public SettingsPanel(TangleCrewSyncConfig config)
 	{
 		this.config = config;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

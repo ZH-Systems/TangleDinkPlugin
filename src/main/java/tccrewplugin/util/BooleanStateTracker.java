@@ -1,6 +1,6 @@
 package tccrewplugin.util;
 
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 public abstract class BooleanStateTracker {
 
     @Inject
-    protected DinkPluginConfig config;
+    protected TangleCrewConfig config;
 
     @Inject
     protected SettingsManager settingsManager;

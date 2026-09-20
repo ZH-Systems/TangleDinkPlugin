@@ -3,7 +3,7 @@ package tccrewplugin.lfg;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import org.apache.commons.lang3.StringUtils;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.lfg.model.LfgCategory;
 import tccrewplugin.lfg.model.LfgGroup;
 import tccrewplugin.lfg.model.LfgMember;
@@ -38,7 +38,7 @@ import java.util.List;
 public class LfgPanel extends PluginPanel
 {
 	private final LfgService service;
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private final LfgStatusPanel statusPanel = new LfgStatusPanel();
 	private final LfgCategoryFilterPanel categoryFilterPanel;
 	private final LfgGroupListPanel groupListPanel = new LfgGroupListPanel();
@@ -49,7 +49,7 @@ public class LfgPanel extends PluginPanel
 	private final JPanel content = new SidebarContentPanel();
 
 	@Inject
-	public LfgPanel(LfgService service, DinkPluginConfig config)
+	public LfgPanel(LfgService service, TangleCrewConfig config)
 	{
 		this.service = service;
 		this.config = config;

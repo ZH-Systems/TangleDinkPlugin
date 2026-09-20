@@ -11,7 +11,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import org.apache.commons.lang3.StringUtils;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.PluginConstants;
 import tccrewplugin.SettingsManager;
 import tccrewplugin.api.ApiResult;
@@ -52,7 +52,7 @@ public class LfgService
 {
 	private final Client client;
 	private final ClientThread clientThread;
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private final ConfigManager configManager;
 	private final Gson gson;
 	private final ChatMessageManager chatMessageManager;
@@ -78,7 +78,7 @@ public class LfgService
 	public LfgService(
 		Client client,
 		ClientThread clientThread,
-		DinkPluginConfig config,
+		TangleCrewConfig config,
 		ConfigManager configManager,
 		Gson gson,
 		ChatMessageManager chatMessageManager,

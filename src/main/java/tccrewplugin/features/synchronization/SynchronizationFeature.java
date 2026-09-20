@@ -1,6 +1,6 @@
 package tccrewplugin.features.synchronization;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 import tccrewplugin.sync.PlayerSyncService;
@@ -10,11 +10,11 @@ import javax.swing.JComponent;
 
 public class SynchronizationFeature implements PluginFeature
 {
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final SynchronizationPanel panel;
 
 	@Inject
-	public SynchronizationFeature(TangleDinkConfig config, PlayerSyncService playerSyncService)
+	public SynchronizationFeature(TangleCrewSyncConfig config, PlayerSyncService playerSyncService)
 	{
 		this.config = config;
 		this.panel = new SynchronizationPanel(playerSyncService);

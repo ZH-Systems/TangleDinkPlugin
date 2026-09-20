@@ -1,6 +1,6 @@
 package tccrewplugin.features.clanchat;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.clanchat.ClanChatService;
 import tccrewplugin.ui.components.LabeledValue;
 import tccrewplugin.util.TimeFormatter;
@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 
 public class ClanChatPanel extends JPanel
 {
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final ClanChatService clanChatService;
 	private final LabeledValue enabled = new LabeledValue("Enabled");
 	private final LabeledValue clanName = new LabeledValue("Clan");
@@ -25,7 +25,7 @@ public class ClanChatPanel extends JPanel
 	private final LabeledValue lastAttempt = new LabeledValue("Last Attempt");
 	private final LabeledValue lastSuccess = new LabeledValue("Last Success");
 
-	public ClanChatPanel(TangleDinkConfig config, ClanChatService clanChatService)
+	public ClanChatPanel(TangleCrewSyncConfig config, ClanChatService clanChatService)
 	{
 		this.config = config;
 		this.clanChatService = clanChatService;

@@ -2,7 +2,7 @@ package tccrewplugin.util;
 
 import com.google.common.hash.HashCode;
 import com.google.gson.Gson;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.domain.AccountType;
 import tccrewplugin.domain.ChatPrivacyMode;
 import lombok.experimental.UtilityClass;
@@ -125,8 +125,8 @@ public class Utils {
      *
      * @param pattern a simple pattern (asterisks are wildcards, and the rest is a string literal)
      * @return a compiled regular expression associated with the simple pattern
-     * @see DinkPluginConfig#lootItemAllowlist()
-     * @see DinkPluginConfig#lootItemDenylist()
+     * @see TangleCrewConfig#lootItemAllowlist()
+     * @see TangleCrewConfig#lootItemDenylist()
      */
     @Nullable
     public Pattern regexify(@NotNull String pattern) {
@@ -196,7 +196,7 @@ public class Utils {
     }
 
     @Nullable
-    public String getChatBadge(@NotNull AccountType type, boolean seasonal, DinkPluginConfig config) {
+    public String getChatBadge(@NotNull AccountType type, boolean seasonal, TangleCrewConfig config) {
         String customBadge = config.customPlayerBadge();
         if (!customBadge.isBlank()) {
             return customBadge;
@@ -319,7 +319,7 @@ public class Utils {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public void captureScreenshot(Client client, ClientThread clientThread, DrawManager drawManager, ImageCapture imageCapture, ExecutorService executor, DinkPluginConfig config, Consumer<Image> consumer) {
+    public void captureScreenshot(Client client, ClientThread clientThread, DrawManager drawManager, ImageCapture imageCapture, ExecutorService executor, TangleCrewConfig config, Consumer<Image> consumer) {
         ChatPrivacyMode privacyMode = config.chatPrivacy();
         boolean chatHidden = hideWidget(privacyMode == ChatPrivacyMode.HIDE_ALL, client, InterfaceID.Chatbox.CHATAREA);
         boolean whispersHidden = hideWidget(privacyMode != ChatPrivacyMode.HIDE_NONE, client, InterfaceID.PmChat.CONTAINER);

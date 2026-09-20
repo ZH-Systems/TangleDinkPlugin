@@ -1,7 +1,7 @@
 # What Was Done Today - 2026-08-06
 
 - removed the stale `lfgMasterChannelWebhook` setting from the RuneLite LFG plugin config because the active shared LFG flow uses the Supabase backend and API token instead of a direct Discord webhook
-- updated `tccrewplugin/DinkPluginConfig.java` so the LFG settings section now only keeps:
+- updated `tccrewplugin/TangleCrewConfig.java` so the LFG settings section now only keeps:
   - `lfgEnabled`
   - `lfgSupabaseUrl`
   - `lfgApiToken`

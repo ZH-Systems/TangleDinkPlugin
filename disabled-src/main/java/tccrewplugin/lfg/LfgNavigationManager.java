@@ -2,8 +2,7 @@ package tccrewplugin.lfg;
 
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
-import net.runelite.client.util.ImageUtil;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 
 import javax.imageio.ImageIO;
@@ -11,18 +10,18 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 @Singleton
 public class LfgNavigationManager
 {
 	private final ClientToolbar clientToolbar;
 	private final LfgPanel panel;
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private NavigationButton button;
 
 	@Inject
-	public LfgNavigationManager(ClientToolbar clientToolbar, LfgPanel panel, DinkPluginConfig config)
+	public LfgNavigationManager(ClientToolbar clientToolbar, LfgPanel panel, TangleCrewConfig config)
 	{
 		this.clientToolbar = clientToolbar;
 		this.panel = panel;
@@ -86,14 +85,13 @@ public class LfgNavigationManager
 
 	private BufferedImage loadIcon()
 	{
-		URL iconUrl = LfgNavigationManager.class.getResource("/sidebar_icon.png");
-		if (iconUrl == null)
+		try (InputStream iconStream = LfgNavigationManager.class.getResourceAsStream("/sidebar_icon.png"))
 		{
-			return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		}
-		try
-		{
-			BufferedImage icon = ImageIO.read(iconUrl);
+			if (iconStream == null)
+			{
+				return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+			}
+			BufferedImage icon = ImageIO.read(iconStream);
 			return icon == null ? new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB) : icon;
 		}
 		catch (IOException ex)

@@ -75,7 +75,7 @@ tasks.register('installDevPlugin', Copy) {
 	dependsOn shadowJar
 	from(tasks.named('shadowJar'))
 	into devSideloadDir
-	rename { 'tangledinkplugin-dev.jar' }
+	rename { 'tanglecrewplugin-dev.jar' }
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {
@@ -85,7 +85,7 @@ tasks.withType(AbstractArchiveTask).configureEach {
 
 tasks.register('shadowJar', Jar) {
 	manifest {
-		attributes('Main-Class': 'tccrewplugin.DinkTest', 'Multi-Release': true)
+		attributes('Main-Class': 'tccrewplugin.TangleCrewTest', 'Multi-Release': true)
 	}
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE

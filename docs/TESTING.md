@@ -16,12 +16,12 @@ If you haven't installed a [JDK](https://whichjdk.com/), we typically recommend 
 
 To launch RuneLite with Dink loaded, run `gradlew run`
 
-This uses `tccrewplugin.DinkTest` with:
+This uses `tccrewplugin.TangleCrewTest` with:
 
 - VM arguments: `-ea`
 - Program arguments: `--developer-mode --debug`
 
-For IntelliJ, you can import the checked-in [Run Dink](../.run/Run%20Dink.run.xml) run configuration.
+For IntelliJ, you can import the checked-in [Run Tangle Crew](../.run/Run%20Dink.run.xml) run configuration.
 
 ## Shadow Jar task
 

@@ -8,7 +8,7 @@ import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
 @ConfigGroup(PluginConstants.CONFIG_GROUP)
-public interface TangleDinkConfig extends Config
+public interface TangleCrewSyncConfig extends Config
 {
 	@ConfigSection(
 		name = "Player Sync",

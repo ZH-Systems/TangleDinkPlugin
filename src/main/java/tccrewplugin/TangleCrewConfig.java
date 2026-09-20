@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.*;
 
 @ConfigGroup(SettingsManager.CONFIG_GROUP)
-public interface DinkPluginConfig extends Config {
+public interface TangleCrewConfig extends Config {
 
     @ConfigSection(
         name = "Event Drop Detection",

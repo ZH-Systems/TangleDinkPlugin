@@ -48,8 +48,10 @@ import static tccrewplugin.util.ConfigUtil.*;
 @Slf4j
 @Singleton
 public class SettingsManager {
-    public static final String CONFIG_GROUP = "dinkplugin";
+    public static final String CONFIG_GROUP = PluginConstants.CONFIG_GROUP;
+    public static final String LEGACY_DINK_CONFIG_GROUP = "dinkplugin";
     public static final String DYNAMIC_IMPORT_CONFIG_KEY = "dynamicConfigUrl";
+    private static final String LEGACY_DINK_MIGRATION_CONFIG_KEY = "legacyDinkConfigMigrated";
 
     private static final Set<Integer> PROBLEMATIC_VARBITS;
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
@@ -94,7 +96,7 @@ public class SettingsManager {
     private final Client client;
     private final ClientThread clientThread;
     private final TcCrewPlugin plugin;
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final ConfigManager configManager;
     private final OkHttpClient httpClient;
 
@@ -102,7 +104,7 @@ public class SettingsManager {
 
     @Inject
     @VisibleForTesting
-    public SettingsManager(Gson gson, Client client, ClientThread clientThread, TcCrewPlugin plugin, DinkPluginConfig config, ConfigManager configManager, OkHttpClient httpClient) {
+    public SettingsManager(Gson gson, Client client, ClientThread clientThread, TcCrewPlugin plugin, TangleCrewConfig config, ConfigManager configManager, OkHttpClient httpClient) {
         this.gson = gson;
         this.client = client;
         this.clientThread = clientThread;
@@ -130,10 +132,12 @@ public class SettingsManager {
 
     @VisibleForTesting
     public void init() {
+        loadConfigMetadata();
+        migrateLegacyDinkConfig();
         migrateBoolean("ignoreSeasonalWorlds", ignoreSeasonal -> ignoreSeasonal ? SeasonalPolicy.REJECT : SeasonalPolicy.ACCEPT, config::setSeasonalPolicy);
         migrateBoolean("screenshotHideChat", hide -> hide ? ChatPrivacyMode.HIDE_ALL : ChatPrivacyMode.HIDE_NONE, config::setChatPrivacy);
 
-        loadConfigMetadata();
+        setFilteredNames(config.filteredNames());
         importDynamicConfig(config.dynamicConfigUrl());
     }
 
@@ -165,7 +169,7 @@ public class SettingsManager {
         });
         hiddenConfigKeys.add("importPolicy"); // not hidden, but shouldn't be overwritten
         webhookConfigKeys = ImmutableSet.<String>builder()
-            .add("discordWebhook") // DinkPluginConfig#primaryWebhook
+            .add("discordWebhook") // TangleCrewConfig#primaryWebhook
             .add("clanEventWebhook")
             .add("clogPbWebhookUrl")
             .addAll(knownConfigKeys.stream()
@@ -452,6 +456,38 @@ public class SettingsManager {
         if (bool == null) return;
         consumer.accept(transform.apply(bool));
         configManager.unsetConfiguration(CONFIG_GROUP, key);
+    }
+
+    private void migrateLegacyDinkConfig() {
+        Boolean migrated = configManager.getConfiguration(CONFIG_GROUP, LEGACY_DINK_MIGRATION_CONFIG_KEY, Boolean.TYPE);
+        if (Boolean.TRUE.equals(migrated)) {
+            return;
+        }
+
+        String prefix = LEGACY_DINK_CONFIG_GROUP + '.';
+        int migratedCount = 0;
+        for (String property : configManager.getConfigurationKeys(prefix)) {
+            String key = property.substring(prefix.length());
+            if (!knownConfigKeys.contains(key)) {
+                continue;
+            }
+
+            String currentValue = configManager.getConfiguration(CONFIG_GROUP, key);
+            if (StringUtils.isNotEmpty(currentValue)) {
+                continue;
+            }
+
+            String legacyValue = configManager.getConfiguration(LEGACY_DINK_CONFIG_GROUP, key);
+            if (legacyValue == null) {
+                continue;
+            }
+
+            configManager.setConfiguration(CONFIG_GROUP, key, legacyValue);
+            migratedCount++;
+        }
+
+        configManager.setConfiguration(CONFIG_GROUP, LEGACY_DINK_MIGRATION_CONFIG_KEY, true);
+        log.debug("Migrated {} legacy Dink config values into {}", migratedCount, CONFIG_GROUP);
     }
 
     private void migrateConfig(MigrationUtil.Metadata data) {

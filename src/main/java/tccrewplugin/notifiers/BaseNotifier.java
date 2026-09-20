@@ -1,7 +1,7 @@
 package tccrewplugin.notifiers;
 
 import tccrewplugin.ClanEventManager;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 import tccrewplugin.domain.SeasonalPolicy;
 import tccrewplugin.message.DiscordMessageHandler;
@@ -26,7 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public abstract class BaseNotifier {
 
     @Inject
-    protected DinkPluginConfig config;
+    protected TangleCrewConfig config;
 
     @Inject
     protected AccountTypeTracker accountTracker;

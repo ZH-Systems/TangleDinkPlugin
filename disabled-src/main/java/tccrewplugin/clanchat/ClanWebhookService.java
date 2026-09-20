@@ -1,7 +1,7 @@
 package tccrewplugin.clanchat;
 
 import com.google.gson.Gson;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.TcCrewPlugin;
 import tccrewplugin.util.ConfigProxyAuth;
 import tccrewplugin.util.ConfigProxyServer;
@@ -37,7 +37,7 @@ public class ClanWebhookService
 	private static final int MAX_ATTEMPTS = 3;
 	private static final Set<Integer> RETRY_STATUS = Set.of(429, 500, 502, 503, 504);
 
-	private final DinkPluginConfig config;
+	private final TangleCrewConfig config;
 	private final ScheduledExecutorService executor;
 	private final OkHttpClient baseClient;
 	private final Gson gson;
@@ -53,7 +53,7 @@ public class ClanWebhookService
 	private volatile long lastQueueWarningNanos;
 
 	@Inject
-	public ClanWebhookService(DinkPluginConfig config, ScheduledExecutorService executor, OkHttpClient baseClient, Gson gson)
+	public ClanWebhookService(TangleCrewConfig config, ScheduledExecutorService executor, OkHttpClient baseClient, Gson gson)
 	{
 		this.config = config;
 		this.executor = executor;

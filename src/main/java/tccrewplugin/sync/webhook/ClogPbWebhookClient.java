@@ -12,7 +12,7 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.TcCrewPlugin;
 import tccrewplugin.sync.model.CollectionLogSnapshot;
 import tccrewplugin.sync.model.PersonalBestSummary;
@@ -50,7 +50,7 @@ public class ClogPbWebhookClient
     private final OkHttpClient httpClient;
     private final ScheduledExecutorService executor;
     private final Gson gson;
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final Object queueLock = new Object();
     private final Deque<QueuedUpload> queue = new ArrayDeque<>();
     private final Deque<ScheduledFuture<?>> retryFutures = new ArrayDeque<>();
@@ -61,7 +61,7 @@ public class ClogPbWebhookClient
     private volatile Call currentCall;
 
     @Inject
-    public ClogPbWebhookClient(OkHttpClient httpClient, ScheduledExecutorService executor, Gson gson, DinkPluginConfig config)
+    public ClogPbWebhookClient(OkHttpClient httpClient, ScheduledExecutorService executor, Gson gson, TangleCrewConfig config)
     {
         this.httpClient = httpClient;
         this.executor = executor;

@@ -91,7 +91,7 @@ public class TcCrewPlugin extends Plugin {
 
     private @Inject ChatMessageManager chatManager;
 
-    private @Inject DinkPluginConfig config;
+    private @Inject TangleCrewConfig config;
     private @Inject SettingsManager settingsManager;
     private @Inject ClanEventManager clanEventManager;
     // private @Inject LfgService lfgService;
@@ -149,7 +149,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        log.debug("Started up Dink");
+        log.debug("Started up Tangle Crew Plugin");
         settingsManager.init();
         clanEventManager.init();
         // LFG sync disabled for the initial PR.
@@ -178,7 +178,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Override
     protected void shutDown() {
-        log.debug("Shutting down Dink");
+        log.debug("Shutting down Tangle Crew Plugin");
         this.resetNotifiers();
         overlayManager.remove(clanEventOverlay);
         collectionLogSyncButtonManager.shutDown();
@@ -211,8 +211,8 @@ public class TcCrewPlugin extends Plugin {
     }
 
     @Provides
-    DinkPluginConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(DinkPluginConfig.class);
+    TangleCrewConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(TangleCrewConfig.class);
     }
 
     @Subscribe

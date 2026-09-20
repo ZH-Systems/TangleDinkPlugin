@@ -18,14 +18,14 @@ import java.time.format.DateTimeFormatter;
 @Singleton
 public class ClanEventManager {
 
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final TcCrewPlugin plugin;
 
     private boolean warnedInvalidEndTime;
     private boolean notifiedEventEnded;
 
     @Inject
-    public ClanEventManager(DinkPluginConfig config, TcCrewPlugin plugin) {
+    public ClanEventManager(TangleCrewConfig config, TcCrewPlugin plugin) {
         this.config = config;
         this.plugin = plugin;
     }

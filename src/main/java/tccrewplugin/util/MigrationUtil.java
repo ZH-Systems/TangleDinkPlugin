@@ -1,7 +1,7 @@
 package tccrewplugin.util;
 
 import com.google.common.collect.ImmutableMap;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.domain.FilterMode;
 import tccrewplugin.domain.PlayerLookupService;
 import lombok.Builder;
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class MigrationUtil {
 
-    public static final Map<String, Function<DinkPluginConfig, Metadata>> PLUGIN_METADATA;
+    public static final Map<String, Function<TangleCrewConfig, Metadata>> PLUGIN_METADATA;
 
-    public Metadata findMetadata(String key, DinkPluginConfig config) {
+    public Metadata findMetadata(String key, TangleCrewConfig config) {
         var fast = PLUGIN_METADATA.get(key);
         if (fast != null) return fast.apply(config);
 
@@ -36,7 +36,7 @@ public class MigrationUtil {
         return null;
     }
 
-    private Metadata getAdamMappings(DinkPluginConfig config) {
+    private Metadata getAdamMappings(TangleCrewConfig config) {
         // https://github.com/Adam-/runelite-plugins/blob/discord-loot-logger/src/main/java/info/sigterm/plugins/discordlootlogger/DiscordLootLoggerConfig.java
         return Metadata.builder()
             .configGroup("discordlootlogger")
@@ -50,7 +50,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getBoredskaMappings(DinkPluginConfig config) {
+    private Metadata getBoredskaMappings(TangleCrewConfig config) {
         // https://github.com/Boredska/gim-bank-discord/blob/master/src/main/java/gim/bank/discord/GimBankDiscordConfig.java
         return Metadata.builder()
             .configGroup("gimbankdiscord")
@@ -61,7 +61,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getBossHusoMappings(DinkPluginConfig config) {
+    private Metadata getBossHusoMappings(TangleCrewConfig config) {
         // https://github.com/BossHuso/discord-rare-drop-notificater/blob/master/src/main/java/com/masterkenth/DiscordRareDropNotificaterConfig.java
         Function<Object, Object> itemListTransformer = v -> ConfigUtil
             .readDelimited(v.toString())
@@ -96,7 +96,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getJakeMappings(DinkPluginConfig config) {
+    private Metadata getJakeMappings(TangleCrewConfig config) {
         // https://github.com/MidgetJake/UniversalDiscordNotifier/blob/master/src/main/java/universalDiscord/UniversalDiscordConfig.java
         return Metadata.builder()
             .configGroup("universalDiscord")
@@ -146,7 +146,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getJamesMappings(DinkPluginConfig config) {
+    private Metadata getJamesMappings(TangleCrewConfig config) {
         // https://github.com/jamesdrudolph/Discord-Death-Notifications/blob/master/src/main/java/moe/cuteanimegirls/discorddeathnotifications/DeathNotificationsConfig.java
         return Metadata.builder()
             .configGroup("discorddeathnotifications")
@@ -160,7 +160,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getPaulMappings(DinkPluginConfig config) {
+    private Metadata getPaulMappings(TangleCrewConfig config) {
         // https://github.com/PJGJ210/Discord-Collection-Logger/blob/master/src/main/java/discordcollectionlogger/DiscordCollectionLoggerConfig.java
         return Metadata.builder()
             .configGroup("discordcollectionlogger")
@@ -174,7 +174,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getRinzMappings(DinkPluginConfig config) {
+    private Metadata getRinzMappings(TangleCrewConfig config) {
         // https://github.com/RinZJ/better-discord-loot-logger/blob/master/src/main/java/com/betterdiscordlootlogger/BetterDiscordLootLoggerConfig.java
         return Metadata.builder()
             .configGroup("betterdiscordlootlogger")
@@ -190,7 +190,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getShamerMappings(DinkPluginConfig config) {
+    private Metadata getShamerMappings(TangleCrewConfig config) {
         // https://github.com/jack0lantern/raidshamer/blob/main/src/main/java/ejedev/raidshamer/RaidShamerConfig.java
         return Metadata.builder()
             .configGroup("raidshamer")
@@ -203,7 +203,7 @@ public class MigrationUtil {
             .build();
     }
 
-    private Metadata getTakamokMappings(DinkPluginConfig config) {
+    private Metadata getTakamokMappings(TangleCrewConfig config) {
         // https://github.com/ATremonte/Discord-Level-Notifications/blob/master/src/main/java/com/discordlevelnotifications/LevelNotificationsConfig.java
         return Metadata.builder()
             .configGroup("discordlevelnotifications")
@@ -270,7 +270,7 @@ public class MigrationUtil {
     }
 
     static {
-        PLUGIN_METADATA = ImmutableMap.<String, Function<DinkPluginConfig, Metadata>>builder()
+        PLUGIN_METADATA = ImmutableMap.<String, Function<TangleCrewConfig, Metadata>>builder()
             .put("BetterDiscordLootLogger", MigrationUtil::getRinzMappings)
             .put("DiscordCollectionLogger", MigrationUtil::getPaulMappings)
             .put("DiscordDeathNotifications", MigrationUtil::getJamesMappings)

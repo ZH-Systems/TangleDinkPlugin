@@ -1,6 +1,6 @@
 # Supabase Backend Agent Prompt: Tangle Crew RuneLite LFG
 
-You are implementing the backend for the existing RuneLite client plugin in `ZH-Systems/TangleDinkPlugin`.
+You are implementing the backend for the existing RuneLite client plugin in `ZH-Systems/TangleCrewPlugin`.
 
 The RuneLite client-side contract is already implemented. Do not change the plugin contract unless you discover and document a blocking technical issue.
 

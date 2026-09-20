@@ -1,6 +1,6 @@
 package tccrewplugin.features.account;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 import tccrewplugin.sync.PlayerSyncService;
@@ -10,11 +10,11 @@ import javax.swing.JComponent;
 
 public class AccountFeature implements PluginFeature
 {
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final AccountPanel panel;
 
 	@Inject
-	public AccountFeature(TangleDinkConfig config, PlayerSyncService playerSyncService)
+	public AccountFeature(TangleCrewSyncConfig config, PlayerSyncService playerSyncService)
 	{
 		this.config = config;
 		this.panel = new AccountPanel(playerSyncService);

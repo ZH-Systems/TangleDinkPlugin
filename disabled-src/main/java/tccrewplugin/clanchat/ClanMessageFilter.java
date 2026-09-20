@@ -1,6 +1,6 @@
 package tccrewplugin.clanchat;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.clanchat.model.ClanMessageRecord;
 import tccrewplugin.clanchat.model.ClanMessageType;
 import tccrewplugin.util.TextSanitizer;
@@ -28,7 +28,7 @@ public class ClanMessageFilter
 		this.duplicateWindowSeconds = Math.max(1, duplicateWindowSeconds);
 	}
 
-	public Decision allow(TangleDinkConfig config, ClanMessageRecord record, boolean loggedIn, String activeClanName)
+	public Decision allow(TangleCrewSyncConfig config, ClanMessageRecord record, boolean loggedIn, String activeClanName)
 	{
 		if (!config.clanWebhookEnabled())
 		{
@@ -77,7 +77,7 @@ public class ClanMessageFilter
 		return Decision.accepted();
 	}
 
-	private boolean matchesType(TangleDinkConfig config, ClanMessageRecord record)
+	private boolean matchesType(TangleCrewSyncConfig config, ClanMessageRecord record)
 	{
 		ClanMessageType type = record.getType();
 		switch (type)
@@ -101,7 +101,7 @@ public class ClanMessageFilter
 		}
 	}
 
-	private boolean matchesClan(TangleDinkConfig config, String activeClanName, String eventClanName)
+	private boolean matchesClan(TangleCrewSyncConfig config, String activeClanName, String eventClanName)
 	{
 		String required = TextSanitizer.normalizeClanName(config.requiredClanName());
 		if (required.isEmpty())
@@ -114,7 +114,7 @@ public class ClanMessageFilter
 		return required.equals(active) || required.equals(eventClan);
 	}
 
-	private boolean guestAllowed(TangleDinkConfig config, ClanMessageRecord record)
+	private boolean guestAllowed(TangleCrewSyncConfig config, ClanMessageRecord record)
 	{
 		Set<String> approved = approvedGuests(config);
 		if (approved.isEmpty())
@@ -124,7 +124,7 @@ public class ClanMessageFilter
 		return approved.contains(TextSanitizer.normalizeRuneScapeName(record.getSender()));
 	}
 
-	private Set<String> approvedGuests(TangleDinkConfig config)
+	private Set<String> approvedGuests(TangleCrewSyncConfig config)
 	{
 		String raw = config.approvedGuestUsernames();
 		if (raw == null || raw.trim().isEmpty())

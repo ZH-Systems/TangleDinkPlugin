@@ -3,7 +3,7 @@ package tccrewplugin.message;
 import com.google.gson.Gson;
 import tccrewplugin.ClanEventManager;
 import tccrewplugin.TcCrewPlugin;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.domain.PlayerLookupService;
 import tccrewplugin.domain.SeasonalPolicy;
 import tccrewplugin.message.templating.Replacements;
@@ -85,7 +85,7 @@ public class DiscordMessageHandler {
     private final Client client;
     private final DrawManager drawManager;
     private final OkHttpClient httpClient;
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final ScheduledExecutorService executor;
     private final ClientThread clientThread;
     private final DiscordService discordService;
@@ -94,7 +94,7 @@ public class DiscordMessageHandler {
 
     @Inject
     @VisibleForTesting
-    public DiscordMessageHandler(Gson gson, Client client, DrawManager drawManager, OkHttpClient httpClient, DinkPluginConfig config, ScheduledExecutorService executor, ClientThread clientThread, DiscordService discordService, ImageCapture imageCapture, ClanEventManager clanEventManager) {
+    public DiscordMessageHandler(Gson gson, Client client, DrawManager drawManager, OkHttpClient httpClient, TangleCrewConfig config, ScheduledExecutorService executor, ClientThread clientThread, DiscordService discordService, ImageCapture imageCapture, ClanEventManager clanEventManager) {
         this.gson = gson;
         this.client = client;
         this.drawManager = drawManager;
@@ -387,7 +387,7 @@ public class DiscordMessageHandler {
      * Captures the next frame and applies the specified rescaling
      * while abiding by {@link Embed#MAX_IMAGE_SIZE}.
      *
-     * @param scalePercent {@link DinkPluginConfig#screenshotScale()} divided by 100.0
+     * @param scalePercent {@link TangleCrewConfig#screenshotScale()} divided by 100.0
      * @param screenshotOverride an optional image to use instead of grabbing a frame from {@link DrawManager}
      * @return future of the image byte array by the image format name
      * @apiNote scalePercent should be in (0, 1]
@@ -458,7 +458,7 @@ public class DiscordMessageHandler {
         return image;
     }
 
-    private static List<Embed> computeEmbeds(@NotNull NotificationBody<?> body, boolean screenshot, DinkPluginConfig config) {
+    private static List<Embed> computeEmbeds(@NotNull NotificationBody<?> body, boolean screenshot, TangleCrewConfig config) {
         NotificationType type = body.getType();
         NotificationData extra = body.getExtra();
         String footerText = body.getCustomFooter() != null ? body.getCustomFooter() : config.embedFooterText();

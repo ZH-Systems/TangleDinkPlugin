@@ -34,7 +34,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.ChatboxInput;
 import net.runelite.client.util.Text;
 import org.apache.commons.lang3.StringUtils;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.SettingsManager;
 import tccrewplugin.TcCrewPlugin;
 import tccrewplugin.domain.AccountType;
@@ -116,7 +116,7 @@ public class ClogPbSyncManager
     private final ChatMessageManager chatMessageManager;
     private final ScheduledExecutorService executor;
     private final Gson gson;
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
     private final TcCrewPlugin plugin;
     private final ClogPbWebhookClient webhookClient;
     private final AccountTypeTracker accountTypeTracker;
@@ -218,7 +218,7 @@ public class ClogPbSyncManager
         ChatMessageManager chatMessageManager,
         ScheduledExecutorService executor,
         Gson gson,
-        DinkPluginConfig config,
+        TangleCrewConfig config,
         TcCrewPlugin plugin,
         ClogPbWebhookClient webhookClient,
         AccountTypeTracker accountTypeTracker,

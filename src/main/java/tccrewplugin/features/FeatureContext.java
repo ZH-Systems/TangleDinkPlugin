@@ -1,6 +1,6 @@
 package tccrewplugin.features;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.sync.PlayerSyncService;
 import tccrewplugin.collectionlog.CollectionLogService;
 import tccrewplugin.ui.MainPanel;
@@ -11,7 +11,7 @@ public class FeatureContext
 {
 	private final Client client;
 	private final ClientThread clientThread;
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final PlayerSyncService playerSyncService;
 	private final CollectionLogService collectionLogService;
 	private final MainPanel mainPanel;
@@ -19,7 +19,7 @@ public class FeatureContext
 	public FeatureContext(
 		Client client,
 		ClientThread clientThread,
-		TangleDinkConfig config,
+		TangleCrewSyncConfig config,
 		PlayerSyncService playerSyncService,
 		CollectionLogService collectionLogService,
 		MainPanel mainPanel
@@ -43,7 +43,7 @@ public class FeatureContext
 		return clientThread;
 	}
 
-	public TangleDinkConfig getConfig()
+	public TangleCrewSyncConfig getConfig()
 	{
 		return config;
 	}

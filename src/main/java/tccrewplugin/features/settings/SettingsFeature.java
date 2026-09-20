@@ -1,6 +1,6 @@
 package tccrewplugin.features.settings;
 
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.features.FeatureCategory;
 import tccrewplugin.features.PluginFeature;
 
@@ -9,11 +9,11 @@ import javax.swing.JComponent;
 
 public class SettingsFeature implements PluginFeature
 {
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final SettingsPanel panel;
 
 	@Inject
-	public SettingsFeature(TangleDinkConfig config)
+	public SettingsFeature(TangleCrewSyncConfig config)
 	{
 		this.config = config;
 		this.panel = new SettingsPanel(config);

@@ -1,6 +1,6 @@
 package tccrewplugin.util;
 
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Authenticator;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor
 public final class ConfigProxyAuth implements Authenticator {
 
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
 
     @Override
     @Nullable

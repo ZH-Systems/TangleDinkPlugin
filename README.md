@@ -1,12 +1,14 @@
-# Tangle Dink Plugin 
+# Tangle Crew Plugin 
 
-Tangle Dink Plugin currently focuses on one sync workflow in one RuneLite sidebar entry:
+Tangle Crew Plugin currently focuses on one sync workflow in one RuneLite sidebar entry:
 
 1. Player-data synchronization against a remote API
 
 It also includes a modular sidebar with collapsible feature folders so the plugin can grow without turning the main panel into a hard-coded list of special cases.
 
 ## Configuration Layout
+
+RuneLite settings are stored under the `tanglecrew` config group. On first startup after the namespace change, the plugin copies matching values from the legacy `dinkplugin` group into `tanglecrew` when the new key is unset, then uses only the Tangle Crew config group going forward.
 
 The active plugin exposes exactly four intended top-level config folders:
 

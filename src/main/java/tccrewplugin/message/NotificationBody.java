@@ -1,7 +1,7 @@
 package tccrewplugin.message;
 
 import com.google.gson.annotations.SerializedName;
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import tccrewplugin.domain.AccountType;
 import tccrewplugin.message.templating.Template;
 import tccrewplugin.notifiers.data.NotificationData;
@@ -56,7 +56,7 @@ public class NotificationBody<T extends NotificationData> {
     /**
      * Information about the current discord user, acquired via RPC (handled by base RuneLite).
      * <p>
-     * This is only sent if {@link DinkPluginConfig#sendDiscordUser()} is enabled.
+     * This is only sent if {@link TangleCrewConfig#sendDiscordUser()} is enabled.
      * While this field is not used by Discord, it can be useful for custom webhook handlers that forward to Discord.
      */
     @Nullable
@@ -65,7 +65,7 @@ public class NotificationBody<T extends NotificationData> {
     /**
      * Filled in with the text of the notifier (e.g., {@link #getText()} is "Forsen has levelled Attack to 100")
      * <p>
-     * This is done by {@link DiscordMessageHandler#createMessage} if {@link tccrewplugin.DinkPluginConfig#discordRichEmbeds()} is disabled.
+     * This is done by {@link DiscordMessageHandler#createMessage} if {@link tccrewplugin.TangleCrewConfig#discordRichEmbeds()} is disabled.
      */
     @Nullable
     @SerializedName("content")
@@ -80,7 +80,7 @@ public class NotificationBody<T extends NotificationData> {
     transient String customTitle;
 
     /**
-     * An optional footer text to override that of {@link DinkPluginConfig#embedFooterText}
+     * An optional footer text to override that of {@link TangleCrewConfig#embedFooterText}
      * within the embed constructed by {@link DiscordMessageHandler#createMessage}
      */
     @Nullable

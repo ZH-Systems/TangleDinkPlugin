@@ -1,6 +1,6 @@
 package tccrewplugin.util;
 
-import tccrewplugin.DinkPluginConfig;
+import tccrewplugin.TangleCrewConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public final class ConfigProxyServer extends ProxySelector {
     private static final List<Proxy> NONE = List.of(Proxy.NO_PROXY);
 
-    private final DinkPluginConfig config;
+    private final TangleCrewConfig config;
 
     @Override
     public List<Proxy> select(URI uri) {

@@ -33,7 +33,7 @@ public class VersionManager {
     private TcCrewPlugin plugin;
 
     @Inject
-    private DinkPluginConfig config;
+    private TangleCrewConfig config;
 
     @Inject
     private ConfigManager configManager;

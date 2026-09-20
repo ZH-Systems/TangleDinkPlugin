@@ -6,7 +6,7 @@ import net.runelite.client.ui.NavigationButton;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 public class SidebarNavigationManager
 {
@@ -26,8 +26,7 @@ public class SidebarNavigationManager
 		{
 			return;
 		}
-		URL iconUrl = MainPanel.class.getResource("/sidebar_icon.png");
-		BufferedImage icon = loadIcon(iconUrl);
+		BufferedImage icon = loadIcon();
 		navigationButton = NavigationButton.builder()
 			.tooltip(tccrewplugin.PluginConstants.PLUGIN_NAME)
 			.icon(icon)
@@ -47,15 +46,15 @@ public class SidebarNavigationManager
 		navigationButton = null;
 	}
 
-	private BufferedImage loadIcon(URL iconUrl)
+	private BufferedImage loadIcon()
 	{
-		if (iconUrl == null)
+		try (InputStream iconStream = MainPanel.class.getResourceAsStream("/sidebar_icon.png"))
 		{
-			return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		}
-		try
-		{
-			BufferedImage icon = ImageIO.read(iconUrl);
+			if (iconStream == null)
+			{
+				return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+			}
+			BufferedImage icon = ImageIO.read(iconStream);
 			return icon == null ? new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB) : icon;
 		}
 		catch (IOException ex)

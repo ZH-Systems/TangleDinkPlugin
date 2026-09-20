@@ -9,7 +9,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.RuneScapeProfileType;
 import okhttp3.OkHttpClient;
 import tccrewplugin.PluginConstants;
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.api.ApiResult;
 import tccrewplugin.api.ClanWebhookAuthenticationMode;
 import tccrewplugin.clanchat.model.ClanMessageRecord;
@@ -42,7 +42,7 @@ public class ClanChatService
 {
 	private final Client client;
 	private final ClientThread clientThread;
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final Gson gson;
 	private final ScheduledExecutorService executor;
 	private final ClanMessageFilter filter = new ClanMessageFilter();
@@ -67,7 +67,7 @@ public class ClanChatService
 	private volatile boolean deliveriesPaused;
 
 	@Inject
-	public ClanChatService(Client client, ClientThread clientThread, TangleDinkConfig config, Gson gson, ScheduledExecutorService executor, OkHttpClient httpClient)
+	public ClanChatService(Client client, ClientThread clientThread, TangleCrewSyncConfig config, Gson gson, ScheduledExecutorService executor, OkHttpClient httpClient)
 	{
 		this.client = client;
 		this.clientThread = clientThread;
@@ -167,7 +167,7 @@ public class ClanChatService
 			lastError = "clan webhooks disabled";
 			return;
 		}
-		ClanMessageRecord record = ClanMessageClassifier.classify("TEST", "Tangle Dink", null, currentClanName.get(), "Webhook test message", client.getWorld(), false, Instant.now(), true);
+		ClanMessageRecord record = ClanMessageClassifier.classify("TEST", "Tangle Crew", null, currentClanName.get(), "Webhook test message", client.getWorld(), false, Instant.now(), true);
 		if (!queue.offer(record))
 		{
 			lastError = "webhook queue full";

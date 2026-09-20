@@ -6,7 +6,7 @@ import net.runelite.api.GameState;
 import net.runelite.client.callback.ClientThread;
 import okhttp3.OkHttpClient;
 import tccrewplugin.PluginConstants;
-import tccrewplugin.TangleDinkConfig;
+import tccrewplugin.TangleCrewSyncConfig;
 import tccrewplugin.api.ApiResult;
 import tccrewplugin.api.ManifestClient;
 import tccrewplugin.api.PlayerSyncApiClient;
@@ -36,7 +36,7 @@ public class PlayerSyncService
 {
 	private final net.runelite.api.Client client;
 	private final ClientThread clientThread;
-	private final TangleDinkConfig config;
+	private final TangleCrewSyncConfig config;
 	private final Gson gson;
 	private final ScheduledExecutorService executor;
 	private final ManifestClient manifestClient;
@@ -60,7 +60,7 @@ public class PlayerSyncService
 	private volatile int retryAttempt;
 	private volatile boolean loggedIn;
 
-	public PlayerSyncService(net.runelite.api.Client client, ClientThread clientThread, TangleDinkConfig config, Gson gson, ScheduledExecutorService executor, OkHttpClient httpClient, CollectionLogService collectionLogService)
+	public PlayerSyncService(net.runelite.api.Client client, ClientThread clientThread, TangleCrewSyncConfig config, Gson gson, ScheduledExecutorService executor, OkHttpClient httpClient, CollectionLogService collectionLogService)
 	{
 		this.client = client;
 		this.clientThread = clientThread;
