@@ -1,16 +1,15 @@
 # Tangle Crew Plugin 
 
-Tangle Crew Plugin currently focuses on one sync workflow in one RuneLite sidebar entry:
+Tangle Crew Plugin currently focuses on two RuneLite config-driven workflows:
 
-1. Player-data synchronization against a remote API
-
-It also includes a modular sidebar with collapsible feature folders so the plugin can grow without turning the main panel into a hard-coded list of special cases.
+1. Event drop detection
+2. Collection-log and personal-best webhook synchronization
 
 ## Configuration Layout
 
 RuneLite settings are stored under the `tanglecrew` config group. On first startup after the namespace change, the plugin copies matching values from the legacy `dinkplugin` group into `tanglecrew` when the new key is unset, then uses only the Tangle Crew config group going forward.
 
-The active plugin exposes exactly four intended top-level config folders:
+The active plugin exposes these intended top-level config folders:
 
 - `Event Drop Detection`
 - `Clog/PB Sync`
@@ -22,18 +21,13 @@ Existing settings stay in their current section.
 The plugin is split into:
 
 - `api/` for HTTP clients and shared request execution
-- `sync/` for manifest loading, snapshot capture, delta calculation, retry state, and submission
-- `collectionlog/` for the explicit collection-log capture flow and item mapping
-- `features/` for sidebar feature modules and their panels
-- `ui/` for the main sidebar panel and navigation
+- `sync/` for collection-log and personal-best capture, retry state, and submission
+- `notifiers/` and `message/` for RuneLite event parsing and webhook message construction
+- `util/` for shared config, formatting, rarity, and game-state helpers
 
 Disabled feature implementations are parked under `disabled-src/main/java`. Gradle does not compile that folder. To restore one, move the package back under `src/main/java` and uncomment the matching plugin wiring.
 
-The main plugin stays small. It starts and stops the top-level services, wires RuneLite events to the relevant service methods, and adds the single sidebar button.
-
-## Adding a Feature
-
-Add a new feature module under `src/main/java/tccrewplugin/features/...`, implement `PluginFeature`, and register it in `FeatureManager`. The sidebar navigation is data-driven from the registry, so the navigation UI does not need a new branch for each feature.
+The main plugin starts and stops the top-level services and wires RuneLite events to the relevant managers and notifiers.
 
 <!--
 Clan chat webhook forwarding is temporarily disabled for the initial PR.
@@ -82,8 +76,11 @@ Both automatic upload toggles are off by default.
 
 ### Commands
 
+On first login after install, the plugin sends these commands to the player in the local chat console once:
+
 - `!clogsync` uploads the cached collection log snapshot
 - `!clogstatus` prints the current sync/cache state locally
+- `!clogpayload` captures the collection log and copies the exact JSON payload to the clipboard without uploading it
 - `!pball` uploads all locally known personal bests
 - `!syncall` uploads a combined collection-log and PB snapshot
 

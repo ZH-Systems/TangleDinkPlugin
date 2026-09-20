@@ -6,7 +6,7 @@ import net.runelite.client.externalplugins.ExternalPluginManager;
 public class TangleCrewTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        ExternalPluginManager.loadBuiltin(TangleCrewSyncPlugin.class);
+        ExternalPluginManager.loadBuiltin(TcCrewPlugin.class);
         RuneLite.main(args);
     }
 }

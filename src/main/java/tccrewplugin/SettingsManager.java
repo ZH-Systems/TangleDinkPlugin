@@ -52,6 +52,7 @@ public class SettingsManager {
     public static final String LEGACY_DINK_CONFIG_GROUP = "dinkplugin";
     public static final String DYNAMIC_IMPORT_CONFIG_KEY = "dynamicConfigUrl";
     private static final String LEGACY_DINK_MIGRATION_CONFIG_KEY = "legacyDinkConfigMigrated";
+    private static final String SYNC_COMMAND_HELP_SHOWN_CONFIG_KEY = "syncCommandHelpShown";
 
     private static final Set<Integer> PROBLEMATIC_VARBITS;
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
@@ -335,6 +336,8 @@ public class SettingsManager {
             return;
         }
 
+        showSyncCommandHelpIfNeeded();
+
         // Since varbit values default to zero and no VarbitChanged occurs if the
         // newly received value is equal to the existing value, we must manually
         // check those where 0 is an invalid value deserving of a warning.
@@ -358,6 +361,16 @@ public class SettingsManager {
         if (lastImport != null && Duration.between(lastImport, Instant.now()).toHours() >= 3) {
             importDynamicConfig(config.dynamicConfigUrl());
         }
+    }
+
+    private void showSyncCommandHelpIfNeeded() {
+        Boolean shown = configManager.getConfiguration(CONFIG_GROUP, SYNC_COMMAND_HELP_SHOWN_CONFIG_KEY, Boolean.TYPE);
+        if (Boolean.TRUE.equals(shown)) {
+            return;
+        }
+
+        plugin.addChatSuccess("Sync commands: !pball uploads personal bests, !clogsync uploads collection log, !syncall uploads both, !clogstatus shows sync status, !clogpayload copies collection-log JSON.");
+        configManager.setConfiguration(CONFIG_GROUP, SYNC_COMMAND_HELP_SHOWN_CONFIG_KEY, true);
     }
 
     void onTick() {

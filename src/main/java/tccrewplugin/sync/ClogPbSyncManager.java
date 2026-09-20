@@ -55,6 +55,7 @@ import tccrewplugin.sync.webhook.UploadOutcome;
 import tccrewplugin.sync.webhook.UploadPriority;
 import tccrewplugin.util.AccountTypeTracker;
 import tccrewplugin.util.ItemSearcher;
+import tccrewplugin.util.Utils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -169,6 +170,7 @@ public class ClogPbSyncManager
     private volatile boolean collectionLogTraversalCompleted;
     private volatile boolean manualCollectionNavigationActive;
     private volatile boolean manualCollectionNavigationClickInFlight;
+    private volatile boolean manualCollectionPayloadDumpRequested;
     private volatile String manualCollectionNavigationCurrentTabLabel;
     private volatile int manualCollectionCompletionAttempts;
     private volatile ScheduledFuture<?> captureFuture;
@@ -317,7 +319,12 @@ public class ClogPbSyncManager
             return;
         }
 
-        if (command.startsWith("!clogsync"))
+        if (command.startsWith("!clogpayload"))
+        {
+            input.consume();
+            onManualClogPayload();
+        }
+        else if (command.startsWith("!clogsync"))
         {
             input.consume();
             onManualClogSync();
@@ -480,7 +487,14 @@ public class ClogPbSyncManager
             {
                 log.debug("Collection log traversal script {} completed", event.getScriptId());
             }
-            scheduleManualCompletion();
+            if (manualCollectionNavigationActive)
+            {
+                handleManualCollectionNavigationProgress();
+            }
+            else
+            {
+                scheduleManualCompletion();
+            }
         }
 
         if (capturePending.get())
@@ -592,6 +606,11 @@ public class ClogPbSyncManager
         executeManual("!clogsync", () -> requestManualCollectionLogSync(CollectionLogSyncTrigger.CHAT_COMMAND));
     }
 
+    public void onManualClogPayload()
+    {
+        executeManual("!clogpayload", this::requestManualCollectionLogPayloadDump);
+    }
+
     public void onManualClogStatus()
     {
         executeManual("!clogstatus", this::showStatus);
@@ -613,6 +632,16 @@ public class ClogPbSyncManager
     }
 
     public boolean requestManualCollectionLogSync(CollectionLogSyncTrigger trigger)
+    {
+        return requestManualCollectionLogSync(trigger, "!clogsync", false);
+    }
+
+    private boolean requestManualCollectionLogPayloadDump()
+    {
+        return requestManualCollectionLogSync(CollectionLogSyncTrigger.CHAT_COMMAND, "!clogpayload", true);
+    }
+
+    private boolean requestManualCollectionLogSync(CollectionLogSyncTrigger trigger, String command, boolean payloadDump)
     {
         if (shuttingDown.get())
         {
@@ -642,6 +671,7 @@ public class ClogPbSyncManager
             manualCollectionSyncRequested.set(false);
             collectionLogTraversalCompleted = false;
             pendingManualCollectionSyncCommand = null;
+            manualCollectionPayloadDumpRequested = false;
             resetManualCollectionCapture();
         }
 
@@ -651,11 +681,12 @@ public class ClogPbSyncManager
             captureFuture.cancel(false);
             captureFuture = null;
         }
-        pendingManualCollectionSyncCommand = "!clogsync";
+        pendingManualCollectionSyncCommand = command;
+        manualCollectionPayloadDumpRequested = payloadDump;
         manualCollectionSyncRequested.set(true);
         collectionLogTraversalActive.set(true);
         collectionLogTraversalCompleted = false;
-        manualCollectionNavigationActive = false;
+        manualCollectionNavigationActive = true;
         manualCollectionNavigationClickInFlight = false;
         manualCollectionNavigationCurrentTabLabel = null;
         manualCollectionNavigationQueue.clear();
@@ -669,6 +700,7 @@ public class ClogPbSyncManager
                 collectionLogTraversalActive.set(false);
                 manualCollectionSyncRequested.set(false);
                 pendingManualCollectionSyncCommand = null;
+                manualCollectionPayloadDumpRequested = false;
                 return;
             }
 
@@ -677,6 +709,7 @@ public class ClogPbSyncManager
                 collectionLogTraversalActive.set(false);
                 manualCollectionSyncRequested.set(false);
                 pendingManualCollectionSyncCommand = null;
+                manualCollectionPayloadDumpRequested = false;
                 plugin.addChatWarning("Clog/PB Sync: collection log is not loaded. Open the Collection Log first.");
                 return;
             }
@@ -686,6 +719,10 @@ public class ClogPbSyncManager
             lastCollectionLogItemTick = collectionLogCaptureStartedTick;
             client.menuAction(-1, InterfaceID.Collection.SEARCH_TOGGLE, MenuAction.CC_OP, 1, -1, "Search", null);
             client.runScript(COLLECTION_LOG_TRAVERSE_SCRIPT);
+            captureVisibleCollectionLogItems();
+            seedManualCollectionNavigationTargets();
+            seedManualCollectionEntryTargets();
+            advanceManualCollectionNavigation();
             if (log.isDebugEnabled())
             {
                 log.debug("Started manual collection log capture via {}", trigger);
@@ -1278,6 +1315,21 @@ public class ClogPbSyncManager
                 metadata == null ? null : metadata.subcategory));
         }
 
+        for (Map.Entry<Integer, CollectionLogItem> entry : capturedCollectionLogItems.entrySet())
+        {
+            int itemId = entry.getKey();
+            if (collectionLogItemDefinitions.containsKey(itemId))
+            {
+                continue;
+            }
+
+            CollectionLogItem item = entry.getValue();
+            if (item != null)
+            {
+                items.add(item);
+            }
+        }
+
         return items;
     }
 
@@ -1309,7 +1361,9 @@ public class ClogPbSyncManager
         }
 
         String command = pendingManualCollectionSyncCommand == null ? "!clogsync" : pendingManualCollectionSyncCommand;
+        boolean payloadDump = manualCollectionPayloadDumpRequested;
         pendingManualCollectionSyncCommand = null;
+        manualCollectionPayloadDumpRequested = false;
         resetManualCollectionCapture();
         if (manualCollectionCompleteFuture != null)
         {
@@ -1325,6 +1379,11 @@ public class ClogPbSyncManager
                 snapshot.getObtainedSlots(),
                 snapshot.getKnownTotalSlots());
         }
+        if (payloadDump)
+        {
+            copyCollectionLogPayload(command, snapshot);
+            return;
+        }
         syncManualCollectionLog(command, snapshot);
     }
 
@@ -1333,6 +1392,7 @@ public class ClogPbSyncManager
         collectionLogTraversalActive.set(false);
         manualCollectionSyncRequested.set(false);
         pendingManualCollectionSyncCommand = null;
+        manualCollectionPayloadDumpRequested = false;
         collectionLogTraversalCompleted = false;
         if (manualCollectionCompleteFuture != null)
         {
@@ -1381,15 +1441,7 @@ public class ClogPbSyncManager
 
         lastQueuedCollectionLogHash.set(hash);
 
-        SyncPayload payload = SyncPayload.of(
-            "collection_log.snapshot",
-            command,
-            buildPlayer(),
-            buildClientMetadata(),
-            snapshot,
-            null,
-            Collections.emptyList()
-        );
+        SyncPayload payload = buildCollectionLogPayload(command, snapshot);
 
         UploadPriority priority = manual ? UploadPriority.HIGH : UploadPriority.LOW;
         if (manual)
@@ -1422,6 +1474,36 @@ public class ClogPbSyncManager
         {
             plugin.addChatSuccess("Clog/PB Sync: collection log upload queued.");
         }
+    }
+
+    private SyncPayload buildCollectionLogPayload(String command, CollectionLogSnapshot snapshot)
+    {
+        return SyncPayload.of(
+            "collection_log.snapshot",
+            command,
+            buildPlayer(),
+            buildClientMetadata(),
+            snapshot,
+            null,
+            Collections.emptyList()
+        );
+    }
+
+    private void copyCollectionLogPayload(String command, CollectionLogSnapshot snapshot)
+    {
+        SyncPayload payload = buildCollectionLogPayload(command, snapshot);
+        String payloadJson = gson.toJson(payload);
+        int itemCount = snapshot == null || snapshot.getItems() == null ? 0 : snapshot.getItems().size();
+
+        Utils.copyToClipboard(payloadJson)
+            .thenRun(() -> plugin.addChatSuccess(String.format(
+                "Clog/PB Sync: copied collection-log payload JSON to clipboard (%d items).",
+                itemCount)))
+            .exceptionally(e ->
+            {
+                plugin.addChatWarning("Clog/PB Sync: failed to copy payload JSON to clipboard.");
+                return null;
+            });
     }
 
     private void syncPersonalBests(String command, boolean manual)

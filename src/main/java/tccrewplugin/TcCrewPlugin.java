@@ -302,6 +302,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick event) {
+        clogPbSyncManager.onGameTick(event);
         settingsManager.onTick();
         clanEventManager.onTick();
         accountTracker.onTick();
@@ -398,6 +399,7 @@ public class TcCrewPlugin extends Plugin {
 
     @Subscribe
     public void onScriptPreFired(ScriptPreFired event) {
+        clogPbSyncManager.onScriptPreFired(event);
         collectionNotifier.onScript(event.getScriptId());
         petNotifier.onScript(event.getScriptId());
         deathNotifier.onScript(event);
