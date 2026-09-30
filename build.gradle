@@ -14,7 +14,7 @@ repositories {
 }
 
 def lombokVersion = '1.18.46'
-def runeLiteVersion = 'latest.' + (project.hasProperty('use.snapshot') ? 'integration' : 'release')
+def runeLiteVersion = '1.13.1'
 def junitVersion = '5.5.2'
 def devSideloadDir = file("${System.getProperty('user.home')}/.runelite/sideloaded-plugins")
 
@@ -90,6 +90,7 @@ tasks.register('shadowJar', Jar) {
 
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	from sourceSets.main.output
+	from('runelite-plugin.properties')
 
 	exclude 'META-INF/INDEX.LIST'
 	exclude 'META-INF/*.SF'
@@ -97,7 +98,6 @@ tasks.register('shadowJar', Jar) {
 	exclude 'META-INF/*.RSA'
 	exclude '**/module-info.class'
 	exclude 'net/runelite/**'
-	exclude 'tccrewplugin/TcCrewPlugin.class'
 
 	group = BasePlugin.BUILD_GROUP
 	archiveClassifier.set('shadow')

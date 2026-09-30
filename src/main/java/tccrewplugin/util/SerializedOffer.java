@@ -15,7 +15,7 @@ public class SerializedOffer {
     private @SerializedName("itemId") int id;
     private @SerializedName("totalQuantity") int quantity;
     private int price;
-    private int spent;
+    private long spent;
 
     public boolean equalsOffer(@NotNull GrandExchangeOffer o) {
         return state == o.getState() && id == o.getItemId() && quantity == o.getTotalQuantity()

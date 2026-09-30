@@ -228,9 +228,9 @@ public class MetaNotifier extends BaseNotifier {
             .mapToInt(id -> DiaryNotifier.isComplete(id, client.getVarbitValue(id)) ? 1 : 0)
             .sum();
         int diaryTotal = AchievementDiary.DIARIES.size();
-        client.runScript(DiaryNotifier.COMPLETED_TASKS_SCRIPT_ID);
+        Utils.runScriptWithPacketPermission(client, DiaryNotifier.COMPLETED_TASKS_SCRIPT_ID);
         int diaryTaskCompleted = client.getIntStack()[0];
-        client.runScript(DiaryNotifier.TOTAL_TASKS_SCRIPT_ID);
+        Utils.runScriptWithPacketPermission(client, DiaryNotifier.TOTAL_TASKS_SCRIPT_ID);
         int diaryTaskTotal = client.getIntStack()[0];
 
         int gambleCount = client.getVarbitValue(VarbitID.BARBASSAULT_GAMBLECOUNT);

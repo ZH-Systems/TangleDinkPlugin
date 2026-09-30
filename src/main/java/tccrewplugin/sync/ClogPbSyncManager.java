@@ -718,7 +718,7 @@ public class ClogPbSyncManager
             collectionLogCaptureStartedTick = client.getTickCount();
             lastCollectionLogItemTick = collectionLogCaptureStartedTick;
             client.menuAction(-1, InterfaceID.Collection.SEARCH_TOGGLE, MenuAction.CC_OP, 1, -1, "Search", null);
-            client.runScript(COLLECTION_LOG_TRAVERSE_SCRIPT);
+            Utils.runScriptWithPacketPermission(client, COLLECTION_LOG_TRAVERSE_SCRIPT);
             captureVisibleCollectionLogItems();
             seedManualCollectionNavigationTargets();
             seedManualCollectionEntryTargets();
@@ -1137,30 +1137,21 @@ public class ClogPbSyncManager
             return;
         }
 
-        ManualCollectionNavigationTarget nextTarget = pollNextManualCollectionNavigationTarget();
-        if (nextTarget == null)
+        if (manualCollectionNavigationQueue.isEmpty())
         {
             manualCollectionNavigationActive = false;
             scheduleManualCompletion();
             return;
         }
 
-        manualCollectionNavigationClickInFlight = true;
-        if (nextTarget.kind == ManualCollectionNavigationKind.TAB)
-        {
-            manualCollectionNavigationCurrentTabLabel = nextTarget.target;
-        }
-
         if (log.isDebugEnabled())
         {
-            log.debug(
-                "Clicking collection log navigation target kind={} option={} target={}",
-                nextTarget.kind,
-                nextTarget.option,
-                nextTarget.target);
+            log.debug("Skipping {} collection log navigation targets; plugin hub rules only allow toggling collection search",
+                manualCollectionNavigationQueue.size());
         }
-
-        client.menuAction(-1, nextTarget.widgetId, MenuAction.CC_OP, 1, -1, nextTarget.option, nextTarget.target);
+        manualCollectionNavigationQueue.clear();
+        manualCollectionNavigationActive = false;
+        scheduleManualCompletion();
     }
 
     private ManualCollectionNavigationTarget pollNextManualCollectionNavigationTarget()

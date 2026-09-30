@@ -174,14 +174,14 @@ public class DiaryNotifier extends BaseNotifier {
             return;
         }
 
-        client.runScript(DiaryNotifier.COMPLETED_TASKS_SCRIPT_ID);
+        Utils.runScriptWithPacketPermission(client, DiaryNotifier.COMPLETED_TASKS_SCRIPT_ID);
         int completedTasks = client.getIntStack()[0];
-        client.runScript(DiaryNotifier.TOTAL_TASKS_SCRIPT_ID);
+        Utils.runScriptWithPacketPermission(client, DiaryNotifier.TOTAL_TASKS_SCRIPT_ID);
         int totalTasks = client.getIntStack()[0];
 
-        client.runScript(COMPLETED_AREA_TASKS_SCRIPT_ID, diary.getAreaId());
+        Utils.runScriptWithPacketPermission(client, COMPLETED_AREA_TASKS_SCRIPT_ID, diary.getAreaId());
         int completedAreaTasks = client.getIntStack()[0];
-        client.runScript(TOTAL_AREA_TASKS_SCRIPT_ID, diary.getAreaId());
+        Utils.runScriptWithPacketPermission(client, TOTAL_AREA_TASKS_SCRIPT_ID, diary.getAreaId());
         int totalAreaTasks = client.getIntStack()[0];
 
         int completedDiaries = getTotalCompleted();

@@ -109,6 +109,13 @@ public class Utils {
         return Text.removeTags(str.replace("<br>", "\n")).replace('\u00A0', ' ').trim();
     }
 
+    public void runScriptWithPacketPermission(@NotNull Client client, Object... arguments) {
+        client.createScriptEventBuilder(arguments)
+            .build()
+            .setCanSendPackets(true)
+            .run();
+    }
+
     /**
      * Converts text into "upper case first" form, as is used by OSRS for item names.
      *
